@@ -1,0 +1,15 @@
+{
+  "name": "claudeflow-ticket-tracker",
+  "version": "1.0.0",
+  "description": "Lightweight ticket tracking system for Claude-flow bug reports",
+  "main": "ticket-server.js",
+  "scripts": {
+    "start": "node ticket-server.js",
+    "ticket": "node ticket-cli.js"
+  },
+  "keywords": ["tickets", "bug-tracker", "claude-flow"],
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}

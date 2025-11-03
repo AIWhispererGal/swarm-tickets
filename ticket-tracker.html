@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude-flow Ticket Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            color: #00d4aa;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: #2a2a2a;
+            border: none;
+            color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background: #333;
+        }
+        
+        .tab.active {
+            background: #00d4aa;
+            color: #1a1a1a;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #00d4aa;
+            font-weight: 500;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: #e0e0e0;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+        
+        textarea {
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+            min-height: 100px;
+        }
+        
+        button {
+            background: #00d4aa;
+            color: #1a1a1a;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #00ffcc;
+            transform: translateY(-2px);
+        }
+        
+        .ticket-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .ticket-card {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .ticket-card:hover {
+            border-color: #00d4aa;
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.1);
+        }
+        
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .ticket-id {
+            font-weight: 700;
+            color: #00d4aa;
+            font-size: 1.1em;
+        }
+        
+        .ticket-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .status-open { background: #ff6b6b; color: white; }
+        .status-in-progress { background: #ffd93d; color: #1a1a1a; }
+        .status-fixed { background: #6bcf7f; color: white; }
+        .status-closed { background: #666; color: white; }
+        
+        .priority-critical { background: #ff3838; color: white; }
+        .priority-high { background: #ff9f43; color: white; }
+        .priority-medium { background: #ffd93d; color: #1a1a1a; }
+        .priority-low { background: #6bcf7f; color: white; }
+        
+        .ticket-route {
+            color: #00d4aa;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 10px;
+        }
+        
+        .error-section {
+            margin: 10px 0;
+        }
+        
+        .error-section h4 {
+            color: #ff6b6b;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .error-content {
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        .ticket-footer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+            font-size: 0.85em;
+            color: #999;
+        }
+        
+        .related-tickets {
+            margin-top: 10px;
+        }
+        
+        .related-link {
+            color: #00d4aa;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        
+        .related-link:hover {
+            text-decoration: underline;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            flex: 1;
+            min-width: 150px;
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #00d4aa;
+        }
+        
+        .stat-label {
+            color: #999;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎫 Claude-flow Ticket Tracker</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('submit')">Submit Ticket</button>
+            <button class="tab" onclick="switchTab('view')">View Tickets</button>
+        </div>
+        
+        <div id="submit-tab" class="tab-content active">
+            <form id="ticket-form">
+                <div class="form-group">
+                    <label for="route">Route/Webpage</label>
+                    <input type="text" id="route" required placeholder="/dashboard/users">
+                </div>
+                
+                <div class="form-group">
+                    <label for="f12-errors">F12 Console Errors</label>
+                    <textarea id="f12-errors" placeholder="Paste console errors from browser DevTools..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="server-errors">Server Console Errors</label>
+                    <textarea id="server-errors" placeholder="Paste server-side console errors..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description (Optional)</label>
+                    <textarea id="description" rows="3" placeholder="Additional context or steps to reproduce..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status">
+                        <option value="open">Open</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="fixed">Fixed</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                
+                <button type="submit">Create Ticket</button>
+            </form>
+        </div>
+        
+        <div id="view-tab" class="tab-content">
+            <div class="stats" id="stats"></div>
+            
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="filter-status">Filter by Status</label>
+                    <select id="filter-status" onchange="filterTickets()">
+                        <option value="">All</option>
+                        <option value="open">Open</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="fixed">Fixed</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-priority">Filter by Priority</label>
+                    <select id="filter-priority" onchange="filterTickets()">
+                        <option value="">All</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="search">Search</label>
+                    <input type="text" id="search" placeholder="Search tickets..." oninput="filterTickets()">
+                </div>
+            </div>
+            
+            <div class="ticket-list" id="ticket-list"></div>
+        </div>
+    </div>
+    
+    <script>
+        let tickets = [];
+        
+        // Load tickets from localStorage
+        function loadTickets() {
+            const stored = localStorage.getItem('claudeflow-tickets');
+            if (stored) {
+                tickets = JSON.parse(stored);
+            }
+        }
+        
+        // Save tickets to localStorage
+        function saveTickets() {
+            localStorage.setItem('claudeflow-tickets', JSON.stringify(tickets));
+        }
+        
+        // Switch between tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            if (tabName === 'view') {
+                renderTickets();
+                renderStats();
+            }
+        }
+        
+        // Handle form submission
+        document.getElementById('ticket-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const ticket = {
+                id: 'TKT-' + Date.now(),
+                route: document.getElementById('route').value,
+                f12Errors: document.getElementById('f12-errors').value,
+                serverErrors: document.getElementById('server-errors').value,
+                description: document.getElementById('description').value,
+                status: document.getElementById('status').value,
+                priority: null, // To be set by swarm
+                relatedTickets: [],
+                swarmActions: [],
+                namespace: null,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            tickets.push(ticket);
+            saveTickets();
+            
+            // Clear form
+            this.reset();
+            
+            alert('Ticket created: ' + ticket.id);
+        });
+        
+        // Render statistics
+        function renderStats() {
+            const stats = {
+                total: tickets.length,
+                open: tickets.filter(t => t.status === 'open').length,
+                inProgress: tickets.filter(t => t.status === 'in-progress').length,
+                fixed: tickets.filter(t => t.status === 'fixed').length
+            };
+            
+            const statsHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${stats.total}</div>
+                    <div class="stat-label">Total Tickets</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.open}</div>
+                    <div class="stat-label">Open</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.inProgress}</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.fixed}</div>
+                    <div class="stat-label">Fixed</div>
+                </div>
+            `;
+            
+            document.getElementById('stats').innerHTML = statsHTML;
+        }
+        
+        // Render tickets
+        function renderTickets(filteredTickets = null) {
+            const ticketsToRender = filteredTickets || tickets;
+            const container = document.getElementById('ticket-list');
+            
+            if (ticketsToRender.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999;">No tickets found.</p>';
+                return;
+            }
+            
+            // Sort by most recent first
+            const sorted = [...ticketsToRender].sort((a, b) => 
+                new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            
+            container.innerHTML = sorted.map(ticket => `
+                <div class="ticket-card">
+                    <div class="ticket-header">
+                        <div class="ticket-id">${ticket.id}</div>
+                        <div class="ticket-meta">
+                            <span class="badge status-${ticket.status}">${ticket.status.toUpperCase()}</span>
+                            ${ticket.priority ? `<span class="badge priority-${ticket.priority}">${ticket.priority.toUpperCase()}</span>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="ticket-route">📍 ${ticket.route}</div>
+                    
+                    ${ticket.description ? `<p style="margin-bottom: 10px;">${ticket.description}</p>` : ''}
+                    
+                    ${ticket.f12Errors ? `
+                        <div class="error-section">
+                            <h4>🔴 F12 Console Errors</h4>
+                            <div class="error-content">${ticket.f12Errors}</div>
+                        </div>
+                    ` : ''}
+                    
+                    ${ticket.serverErrors ? `
+                        <div class="error-section">
+                            <h4>🖥️ Server Console Errors</h4>
+                            <div class="error-content">${ticket.serverErrors}</div>
+                        </div>
+                    ` : ''}
+                    
+                    ${ticket.swarmActions.length > 0 ? `
+                        <div class="error-section">
+                            <h4>🤖 Swarm Actions</h4>
+                            <div class="error-content">${ticket.swarmActions.join('\n')}</div>
+                        </div>
+                    ` : ''}
+                    
+                    ${ticket.namespace ? `
+                        <div style="margin-top: 10px;">
+                            <strong>Namespace:</strong> <code>${ticket.namespace}</code>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="ticket-footer">
+                        <div>Created: ${new Date(ticket.createdAt).toLocaleString()}</div>
+                        <div>Updated: ${new Date(ticket.updatedAt).toLocaleString()}</div>
+                        ${ticket.relatedTickets.length > 0 ? `
+                            <div class="related-tickets">
+                                <strong>Related:</strong> 
+                                ${ticket.relatedTickets.map(id => 
+                                    `<a href="#" class="related-link" onclick="filterByTicketId('${id}'); return false;">${id}</a>`
+                                ).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Filter tickets
+        function filterTickets() {
+            const statusFilter = document.getElementById('filter-status').value;
+            const priorityFilter = document.getElementById('filter-priority').value;
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            
+            let filtered = tickets;
+            
+            if (statusFilter) {
+                filtered = filtered.filter(t => t.status === statusFilter);
+            }
+            
+            if (priorityFilter) {
+                filtered = filtered.filter(t => t.priority === priorityFilter);
+            }
+            
+            if (searchTerm) {
+                filtered = filtered.filter(t => 
+                    t.id.toLowerCase().includes(searchTerm) ||
+                    t.route.toLowerCase().includes(searchTerm) ||
+                    t.description.toLowerCase().includes(searchTerm) ||
+                    t.f12Errors.toLowerCase().includes(searchTerm) ||
+                    t.serverErrors.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderTickets(filtered);
+        }
+        
+        // Filter by specific ticket ID
+        function filterByTicketId(id) {
+            document.getElementById('search').value = id;
+            filterTickets();
+        }
+        
+        // Initialize
+        loadTickets();
+    </script>
+</body>
+</html>

@@ -1,15 +1,54 @@
 {
-  "name": "claudeflow-ticket-tracker",
+  "name": "swarm-tickets",
   "version": "1.0.0",
-  "description": "Lightweight ticket tracking system for Claude-flow bug reports",
+  "description": "Lightweight ticket tracking system for AI-powered bug fixing with Claude-flow/Claude Code",
   "main": "ticket-server.js",
+  "bin": {
+    "swarm-tickets": "./ticket-server.js"
+  },
   "scripts": {
     "start": "node ticket-server.js",
-    "ticket": "node ticket-cli.js"
+    "ticket": "node ticket-cli.js",
+    "postinstall": "node setup.js"
   },
-  "keywords": ["tickets", "bug-tracker", "claude-flow"],
+  "files": [
+    "ticket-server.js",
+    "ticket-cli.js",
+    "ticket-tracker.html",
+    "backup-tickets.sh",
+    "tickets.example.json",
+    "setup.js",
+    "SKILL.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "tickets",
+    "bug-tracker",
+    "issue-tracker",
+    "swarm",
+    "claude",
+    "claude-flow",
+    "claude-code",
+    "ai",
+    "automation",
+    "development-tools"
+  ],
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5"
+  },
+"repository": {
+  "type": "git",
+  "url": "git+https://github.com/AIWhispererGal/swarm-tickets.git"
+},
+"bugs": {
+  "url": "https://github.com/AIWhispererGal/swarm-tickets/issues"
+},
+"homepage": "https://github.com/AIWhispererGal/swarm-tickets#readme",
+  "author": "AIWhispererGal and Claude Sonnet 4.5",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

@@ -15,7 +15,14 @@
         }
         
         .container { max-width: 1200px; margin: 0 auto; }
-        h1 { margin-bottom: 30px; color: #00d4aa; }
+        h1 { margin-bottom: 10px; color: #00d4aa; }
+        
+        .project-name {
+            color: #999;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+            font-weight: normal;
+        }
         
         .server-status {
             padding: 10px 15px;
@@ -207,33 +214,77 @@
             color: #999;
             font-size: 0.9em;
         }
+        
+        .quick-prompt-btn {
+            background: #6c5ce7;
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        
+        .quick-prompt-btn:hover {
+            background: #5f4fd1;
+        }
+        
+        .settings-section {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+        }
+        
+        .settings-section h3 {
+            color: #00d4aa;
+            margin-bottom: 15px;
+        }
+        
+        .template-info {
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #999;
+        }
+        
+        .template-info code {
+            color: #00d4aa;
+            background: #2a2a2a;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎫 Claude-flow Ticket Tracker</h1>
+        <div class="project-name" id="project-name">📁 Loading project...</div>
         
         <div id="server-status" class="server-status"></div>
         
         <div class="tabs">
             <button class="tab active" onclick="switchTab('submit')">Submit Ticket</button>
             <button class="tab" onclick="switchTab('view')">View Tickets</button>
+            <button class="tab" onclick="switchTab('settings')">Settings</button>
         </div>
         
         <div id="submit-tab" class="tab-content active">
             <form id="ticket-form">
                 <div class="form-group">
-                    <label for="route">Route/Webpage</label>
+                    <label for="route" id="route-form-label">Route/Webpage</label>
                     <input type="text" id="route" required placeholder="/dashboard/users">
                 </div>
                 
                 <div class="form-group">
-                    <label for="f12-errors">F12 Console Errors</label>
+                    <label for="f12-errors" id="f12-form-label">F12 Console Errors</label>
                     <textarea id="f12-errors" placeholder="Paste console errors from browser DevTools..."></textarea>
                 </div>
                 
                 <div class="form-group">
-                    <label for="server-errors">Server Console Errors</label>
+                    <label for="server-errors" id="server-form-label">Server Console Errors</label>
                     <textarea id="server-errors" placeholder="Paste server-side console errors..."></textarea>
                 </div>
                 
@@ -290,12 +341,155 @@
             
             <div class="ticket-list" id="ticket-list"></div>
         </div>
+        
+        <div id="settings-tab" class="tab-content">
+            <div class="settings-section">
+                <h3>Quick Prompt Template</h3>
+                <p style="margin-bottom: 15px; color: #999;">Customize the prompt that gets copied when you click the Quick Prompt button on a ticket.</p>
+                
+                <div class="form-group">
+                    <label for="prompt-template">Template</label>
+                    <textarea id="prompt-template" rows="5" placeholder="Please investigate and fix ticket {TICKET_ID}."></textarea>
+                    <div class="template-info">
+                        <strong>Available placeholders:</strong>
+                        <ul style="margin-top: 5px; margin-left: 20px;">
+                            <li><code>{TICKET_ID}</code> - The ticket's unique identifier</li>
+                        </ul>
+                        <p style="margin-top: 10px;">💡 Tip: Keep it simple and let Claude-flow ask clarifying questions as needed.</p>
+                    </div>
+                </div>
+                
+                <button onclick="savePromptTemplate()">Save Template</button>
+                <button onclick="resetPromptTemplate()" style="background: #666; margin-left: 10px;">Reset to Default</button>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Project & Field Labels</h3>
+                <p style="margin-bottom: 15px; color: #999;">Customize how fields are displayed in your ticket tracker.</p>
+                
+                <div class="form-group">
+                    <label for="project-name-input">Project Name</label>
+                    <input type="text" id="project-name-input" placeholder="My Awesome Project">
+                </div>
+                
+                <div class="form-group">
+                    <label for="route-label">Location Field Label</label>
+                    <input type="text" id="route-label" placeholder="Route/Webpage">
+                </div>
+                
+                <div class="form-group">
+                    <label for="f12-label">Client Errors Field Label</label>
+                    <input type="text" id="f12-label" placeholder="F12 Console Errors">
+                </div>
+                
+                <div class="form-group">
+                    <label for="server-label">Server Errors Field Label</label>
+                    <input type="text" id="server-label" placeholder="Server Console Errors">
+                </div>
+                
+                <button onclick="saveFieldLabels()">Save Labels</button>
+                <button onclick="resetFieldLabels()" style="background: #666; margin-left: 10px;">Reset to Default</button>
+            </div>
+        </div>
     </div>
     
     <script>
         let tickets = [];
         let useServer = false;
         const API_BASE = 'http://localhost:3456/api';
+        const DEFAULT_PROMPT_TEMPLATE = 'Please investigate and fix ticket {TICKET_ID}.';
+        const DEFAULT_FIELD_LABELS = {
+            projectName: 'Ticket Tracker',
+            route: 'Route/Webpage',
+            f12: 'F12 Console Errors',
+            server: 'Server Console Errors'
+        };
+        
+        // Load field labels from localStorage or use defaults
+        function getFieldLabels() {
+            const stored = localStorage.getItem('claudeflow-field-labels');
+            return stored ? JSON.parse(stored) : DEFAULT_FIELD_LABELS;
+        }
+        
+        // Update project name display
+        function updateProjectName() {
+            const labels = getFieldLabels();
+            document.getElementById('project-name').textContent = '📁 ' + labels.projectName;
+        }
+        
+        // Update all form labels
+        function updateFormLabels() {
+            const labels = getFieldLabels();
+            document.getElementById('route-form-label').textContent = labels.route;
+            document.getElementById('f12-form-label').textContent = labels.f12;
+            document.getElementById('server-form-label').textContent = labels.server;
+        }
+        
+        // Load prompt template from localStorage or use default
+        function getPromptTemplate() {
+            return localStorage.getItem('claudeflow-prompt-template') || DEFAULT_PROMPT_TEMPLATE;
+        }
+        
+        // Save prompt template to localStorage
+        function savePromptTemplate() {
+            const template = document.getElementById('prompt-template').value.trim();
+            if (!template) {
+                alert('Template cannot be empty!');
+                return;
+            }
+            localStorage.setItem('claudeflow-prompt-template', template);
+            alert('✅ Prompt template saved!');
+        }
+        
+        // Reset prompt template to default
+        function resetPromptTemplate() {
+            if (confirm('Reset to default template?')) {
+                localStorage.removeItem('claudeflow-prompt-template');
+                document.getElementById('prompt-template').value = DEFAULT_PROMPT_TEMPLATE;
+                alert('✅ Template reset to default!');
+            }
+        }
+        
+        // Save field labels to localStorage
+        function saveFieldLabels() {
+            const labels = {
+                projectName: document.getElementById('project-name-input').value.trim() || DEFAULT_FIELD_LABELS.projectName,
+                route: document.getElementById('route-label').value.trim() || DEFAULT_FIELD_LABELS.route,
+                f12: document.getElementById('f12-label').value.trim() || DEFAULT_FIELD_LABELS.f12,
+                server: document.getElementById('server-label').value.trim() || DEFAULT_FIELD_LABELS.server
+            };
+            localStorage.setItem('claudeflow-field-labels', JSON.stringify(labels));
+            updateProjectName();
+            updateFormLabels();
+            alert('✅ Field labels saved!');
+        }
+        
+        // Reset field labels to defaults
+        function resetFieldLabels() {
+            if (confirm('Reset all field labels to defaults?')) {
+                localStorage.removeItem('claudeflow-field-labels');
+                document.getElementById('project-name-input').value = DEFAULT_FIELD_LABELS.projectName;
+                document.getElementById('route-label').value = DEFAULT_FIELD_LABELS.route;
+                document.getElementById('f12-label').value = DEFAULT_FIELD_LABELS.f12;
+                document.getElementById('server-label').value = DEFAULT_FIELD_LABELS.server;
+                updateProjectName();
+                updateFormLabels();
+                alert('✅ Labels reset to defaults!');
+            }
+        }
+        
+        // Copy quick prompt for a ticket
+        function copyQuickPrompt(ticketId) {
+            const template = getPromptTemplate();
+            const prompt = template.replace(/{TICKET_ID}/g, ticketId);
+            
+            navigator.clipboard.writeText(prompt).then(() => {
+                alert('✅ Prompt copied to clipboard!\n\n' + prompt);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('❌ Failed to copy to clipboard');
+            });
+        }
         
         // Check if server is available
         async function checkServer() {
@@ -386,6 +580,14 @@
                 await loadTickets();
                 renderTickets();
                 renderStats();
+            } else if (tabName === 'settings') {
+                // Load current template and field labels
+                document.getElementById('prompt-template').value = getPromptTemplate();
+                const labels = getFieldLabels();
+                document.getElementById('project-name-input').value = labels.projectName;
+                document.getElementById('route-label').value = labels.route;
+                document.getElementById('f12-label').value = labels.f12;
+                document.getElementById('server-label').value = labels.server;
             }
         }
         
@@ -444,6 +646,7 @@
         function renderTickets(filteredTickets = null) {
             const ticketsToRender = filteredTickets || tickets;
             const container = document.getElementById('ticket-list');
+            const labels = getFieldLabels();
             
             if (ticketsToRender.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #999;">No tickets found.</p>';
@@ -471,14 +674,14 @@
                     
                     ${ticket.f12Errors ? `
                         <div class="error-section">
-                            <h4>🔴 F12 Console Errors</h4>
+                            <h4>🔴 ${labels.f12}</h4>
                             <div class="error-content">${ticket.f12Errors}</div>
                         </div>
                     ` : ''}
                     
                     ${ticket.serverErrors ? `
                         <div class="error-section">
-                            <h4>🖥️ Server Console Errors</h4>
+                            <h4>🖥️ ${labels.server}</h4>
                             <div class="error-content">${ticket.serverErrors}</div>
                         </div>
                     ` : ''}
@@ -506,6 +709,10 @@
                             </div>
                         ` : ''}
                     </div>
+                    
+                    <button class="quick-prompt-btn" onclick="copyQuickPrompt('${ticket.id}')">
+                        📋 Quick Prompt
+                    </button>
                 </div>
             `).join('');
         }
@@ -540,6 +747,8 @@
         }
         
         // Initialize
+        updateProjectName();
+        updateFormLabels();
         loadTickets();
     </script>
 </body>

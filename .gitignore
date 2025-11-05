@@ -1,1 +1,22 @@
+# Dependencies
 node_modules/
+
+# Local tickets (users should have their own)
+tickets.json
+ticket-backups/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

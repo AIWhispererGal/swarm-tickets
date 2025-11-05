@@ -109,7 +109,7 @@
       "f12Errors": "council-files:1  GET http://localhost:3010/council-files 404 (Not Found)\nRefused to connect to 'http://localhost:3010/.well-known/appspecific/com.chrome.devtools.json' because it violates the following Content Security Policy directive: \"default-src 'none'\". Note that 'connect-src' was not explicitly set, so 'default-src' is used as a fallback.\n\n",
       "serverErrors": "None",
       "description": "",
-      "status": "closed",
+      "status": "fixed",
       "priority": "medium",
       "relatedTickets": [
         "TKT-1762146598976"
@@ -138,7 +138,7 @@
       "f12Errors": "about:1  GET http://localhost:3010/about 404 (Not Found)\nRefused to connect to 'http://localhost:3010/.well-known/appspecific/com.chrome.devtools.json' because it violates the following Content Security Policy directive: \"default-src 'none'\". Note that 'connect-src' was not explicitly set, so 'default-src' is used as a fallback.\n\n",
       "serverErrors": "None",
       "description": "",
-      "status": "closed",
+      "status": "fixed",
       "priority": "low",
       "relatedTickets": [
         "TKT-1762146570709"
@@ -167,7 +167,7 @@
       "f12Errors": "Refused to connect to 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css.map' because it violates the following Content Security Policy directive: \"connect-src 'self' https://edxcvppawhiyuhrnzxjm.supabase.co\".\n\nmobile-menu.js:192 Mobile menu initialized\naccessibility-keyboard.js:293 ✓ Accessibility keyboard navigation loaded\nRefused to connect to 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js.map' because it violates the following Content Security Policy directive: \"connect-src 'self' https://edxcvppawhiyuhrnzxjm.supabase.co\".\n\ntooltips.js:29 [Tooltips] Initialized 4 tooltips\n",
       "serverErrors": "none",
       "description": "",
-      "status": "closed",
+      "status": "in-progress",
       "priority": "low",
       "relatedTickets": [
         "TKT-1762142278373",
@@ -180,23 +180,17 @@
           "agent": "tester",
           "action": "Analyzed CSP violations for Bootstrap CDN source maps",
           "result": "NOT A BUG - EXPECTED BEHAVIOR - CSP policy is working correctly by blocking external source map requests. Zero impact on functionality, UX, or security. Source maps are DevTools-only resources never seen by users. Recommendation: IGNORE or optionally add https://cdn.jsdelivr.net to connectSrc directive in server.js:89 if DevTools warnings are disruptive. Same issue affects TKT-1762142278373, TKT-1762142359771, TKT-1762146912527. See /docs/CSP_SOURCE_MAP_ASSESSMENT.md for comprehensive analysis."
-        },
-        {
-          "timestamp": "2025-11-04T00:28:54.104Z",
-          "agent": "analyst",
-          "action": "Confirmed as informational - not a bug",
-          "result": "INFORMATIONAL - Session 10: CSP working correctly by blocking source maps. Zero functional impact. DevTools-only warnings. Can close this ticket."
         }
       ],
       "namespace": "security/csp",
       "createdAt": "2025-11-03T05:12:15.309Z",
-      "updatedAt": "2025-11-04T00:28:54.104Z"
+      "updatedAt": "2025-11-03T05:37:00.000Z"
     },
     {
       "id": "TKT-1762146797458",
       "route": "/dashboard",
       "f12Errors": "dashboard:1019  POST http://localhost:3010/dashboard/upload 403 (Forbidden)\n(anonymous) @ dashboard:1019\ndashboard.js?v=2:741  POST http://localhost:3010/dashboard/upload 403 (Forbidden)\n(anonymous) @ dashboard.js?v=2:741\n",
-      "serverErrors": "🔍 [DEBUG] Supabase query response: { data: { role: 'owner' }, error: null }\n🔍 [DEBUG] Returning role: owner\nServer error: ForbiddenError: invalid csrf token\n    at csrf (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\csurf\\index.js:112:19)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\server.js:187:3\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:286:9)\n    at Function.process_params (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at serveStatic (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\serve-static\\index.js:75:16)\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13) {\n  code: 'EBADCSRFTOKEN'\n}\nServer error: ForbiddenError: invalid csrf token\n    at csrf (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\csurf\\index.js:112:19)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\server.js:187:3\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at serveStatic (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\serve-static\\index.js:75:16)\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13) {\n  code: 'EBADCSRFTOKEN'\n}\n",
+      "serverErrors": "🔍 [DEBUG] Supabase query response: { data: { role: 'owner' }, error: null }\n🔍 [DEBUG] Returning role: owner\nServer error: ForbiddenError: invalid csrf token\n    at csrf (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\csurf\\index.js:112:19)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\server.js:187:3\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at serveStatic (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\serve-static\\index.js:75:16)\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13) {\n  code: 'EBADCSRFTOKEN'\n}\nServer error: ForbiddenError: invalid csrf token\n    at csrf (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\csurf\\index.js:112:19)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\server.js:187:3\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at serveStatic (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\serve-static\\index.js:75:16)\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13) {\n  code: 'EBADCSRFTOKEN'\n}\n",
       "description": "This was after clicking upload document",
       "status": "fixed",
       "priority": "critical",
@@ -284,7 +278,7 @@
       "id": "TKT-1762149764221",
       "route": "/dashboard",
       "f12Errors": "mobile-menu.js:192 Mobile menu initialized\naccessibility-keyboard.js:293 ✓ Accessibility keyboard navigation loaded\ntooltips.js:29 [Tooltips] Initialized 4 tooltips\nRefused to connect to '<URL>' because it violates the following Content Security Policy directive: \"connect-src 'self' <URL>\".\n\nRefused to connect to '<URL>' because it violates the following Content Security Policy directive: \"connect-src 'self' <URL>\".\n\nRefused to connect to '<URL>' because it violates the following Content Security Policy directive: \"connect-src 'self' <URL>\".\n\nRefused to connect to '<URL>' because it violates the following Content Security Policy directive: \"connect-src 'self' <URL>\".\n\nRefused to connect to '<URL>' because it violates the following Content Security Policy directive: \"connect-src 'self' <URL>\".\n\ndashboard:1 Blocked aria-hidden on an element because its descendant retained focus. The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor. Consider using the inert attribute instead, which will also prevent focus. For more details, see the aria-hidden section of the WAI-ARIA specification at https://w3c.github.io/aria/#aria-hidden.\nElement with focus: <button.btn-close>\nAncestor with aria-hidden: <div.modal fade#createDocumentModal> <div class=​\"modal fade\" id=​\"createDocumentModal\" tabindex=​\"-1\" aria-labelledby=​\"createDocumentModalLabel\" aria-hidden=​\"true\" style=​\"display:​ none;​\">​…​</div>​\ndashboard/upload:1  Failed to load resource: the server responded with a status of 403 (Forbidden)\ndashboard/upload:1  Failed to load resource: the server responded with a status of 403 (Forbidden)\ndashboard:1 Blocked aria-hidden on an element because its descendant retained focus. The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor. Consider using the inert attribute instead, which will also prevent focus. For more details, see the aria-hidden section of the WAI-ARIA specification at https://w3c.github.io/aria/#aria-hidden.\nElement with focus: <button.btn btn-secondary>\nAncestor with aria-hidden: <div.modal fade#uploadDocumentModal> <div class=​\"modal fade\" id=​\"uploadDocumentModal\" tabindex=​\"-1\" aria-labelledby=​\"uploadDocumentModalLabel\" aria-hidden=​\"true\" style=​\"display:​ none;​\">​…​</div>​\n",
-      "serverErrors": "Server error: ForbiddenError: invalid csrf token\n    at csrf (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\csurf\\index.js:112:19)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\server.js:187:3\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at serveStatic (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\serve-static\\index.js:75:16)\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13) {\n  code: 'EBADCSRFTOKEN'\n}\nServer error: ForbiddenError: invalid csrf token\n    at csrf (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\csurf\\index.js:112:19)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\server.js:187:3\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at serveStatic (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\serve-static\\index.js:75:16)\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13) {\n  code: 'EBADCSRFTOKEN'\n}",
+      "serverErrors": "Server error: ForbiddenError: invalid csrf token\n    at csrf (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\csurf\\index.js:112:19)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\server.js:187:3\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at serveStatic (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\serve-static\\index.js:75:16)\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13) {\n  code: 'EBADCSRFTOKEN'\n}\nServer error: ForbiddenError: invalid csrf token\n    at csrf (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\csurf\\index.js:112:19)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\server.js:187:3\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at serveStatic (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\serve-static\\index.js:75:16)\n    at Layer.handle [as handle_request] (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\mgall\\OneDrive\\Desktop\\nc-platform\\node_modules\\express\\lib\\router\\index.js:328:13) {\n  code: 'EBADCSRFTOKEN'\n}",
       "description": "Document upload still failing with 403 CSRF error after initial fix. Root cause: CSRF middleware placed BEFORE multer instead of AFTER.",
       "status": "fixed",
       "priority": "critical",
@@ -315,7 +309,7 @@
       "f12Errors": "accessibility-keyboard.js:293 ✓ Accessibility keyboard navigation loaded\nRefused to connect to 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js.map' because it violates the following Content Security Policy directive: \"connect-src 'self' https://edxcvppawhiyuhrnzxjm.supabase.co\".\n\nRefused to connect to 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css.map' because it violates the following Content Security Policy directive: \"connect-src 'self' https://edxcvppawhiyuhrnzxjm.supabase.co\".\n\n",
       "serverErrors": "None",
       "description": "F12 ISSUES tab says:\nContent Security Policy of your site blocks some resources\nSome resources are blocked because their origin is not listed in your site's Content Security Policy (CSP). Your site's CSP is allowlist-based, so resources must be listed in the allowlist in order to be accessed.\n\nA site's Content Security Policy is set either via an HTTP header (recommended), or via a meta HTML tag.\n\nTo fix this issue do one of the following:\n\n(Recommended) If you're using an allowlist for 'script-src', consider switching from an allowlist CSP to a strict CSP, because strict CSPs are more robust against XSS. See how to set a strict CSP.\nOr carefully check that all of the blocked resources are trustworthy; if they are, include their sources in the CSP of your site. ⚠️Never add a source you don't trust to your site's CSP. If you don't trust the source, consider hosting resources on your own site instead.\n2 directives\nLearn more: Content Security Policy - Source Allowlists",
-      "status": "closed",
+      "status": "informational",
       "priority": "low",
       "relatedTickets": [
         "TKT-1762146735309"
@@ -392,11 +386,9 @@
       "f12Errors": "mobile-menu.js:192 Mobile menu initialized\naccessibility-keyboard.js:293 ✓ Accessibility keyboard navigation loaded\ntooltips.js:29 [Tooltips] Initialized 4 tooltips\ndashboard/api/documents/create:1  Failed to load resource: the server responded with a status of 400 (Bad Request)\ndashboard.js?v=2:475 Error creating document: Error: Could not find the 'created_by' column of 'documents' in the schema cache\n    at HTMLButtonElement.<anonymous> (dashboard.js?v=2:472:17)\n(anonymous) @ dashboard.js?v=2:475\nRefused to connect to 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js.map' because it violates the following Content Security Policy directive: \"connect-src 'self' https://edxcvppawhiyuhrnzxjm.supabase.co\".\n\nRefused to connect to 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css.map' because it violates the following Content Security Policy directive: \"connect-src 'self' https://edxcvppawhiyuhrnzxjm.supabase.co\".\n\n",
       "serverErrors": "🔍 [DEBUG] Supabase query response: { data: { role: 'owner' }, error: null }\n🔍 [DEBUG] Returning role: owner\n[DocumentService] Error creating document: {\n  code: 'PGRST204',\n  details: null,\n  hint: null,\n  message: \"Could not find the 'created_by' column of 'documents' in the schema cache\"\n}",
       "description": "Create New Document",
-      "status": "fixed",
+      "status": "in-progress",
       "priority": "critical",
-      "relatedTickets": [
-        "TKT-1762197080119"
-      ],
+      "relatedTickets": [],
       "swarmActions": [
         {
           "timestamp": "2025-11-03T17:14:45.086Z",
@@ -415,24 +407,11 @@
           "agent": "queen-coordinator",
           "action": "Created migration 014 to add missing columns",
           "result": "MIGRATION CREATED - database/migrations/014-add-documents-created-by.sql adds created_by and created_by_email columns to documents table. Includes backfill from document_versions table and schema cache refresh. USER ACTION REQUIRED: Run migration in Supabase SQL Editor (15 min). This is the ONLY blocking issue preventing document creation. See START_HERE_TICKET_ANALYSIS.md and QUICK_START_TICKET_FIXES.md for step-by-step instructions."
-        },
-        {
-          "timestamp": "2025-11-04T00:28:54.104Z",
-          "agent": "queen-coordinator",
-          "action": "Migration 014 applied - column exists but creation still blocked",
-          "result": "PARTIAL FIX - Session 10: Human ran migration 014. created_by column now exists. However, document creation still fails due to RLS policy issue (see TKT-1762197080119). User-context client created but needs more debugging."
-        },
-        {
-          "timestamp": "2025-11-04T01:01:18.220Z",
-          "session": 11,
-          "agent": "queen-coordinator",
-          "action": "Verified created_by column works with fixed RLS",
-          "result": "Column added in Migration 014. Now functional with corrected RLS policies from Migrations 016-017."
         }
       ],
       "namespace": "database/schema",
       "createdAt": "2025-11-03T16:48:48.841Z",
-      "updatedAt": "2025-11-04T00:28:54.104Z"
+      "updatedAt": "2025-11-03T17:14:45.086Z"
     },
     {
       "id": "TKT-1762196408830",
@@ -440,20 +419,13 @@
       "f12Errors": "(index):64 cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation\n(anonymous) @ (index):64\nhtmx.min.js:1  Failed to load resource: the server responded with a status of 404 (Not Found)\nmembers?name=Michelle+Gallagher&email=michelleg%40resedacouncil.org&phone=3109667838&board_position…:1 Refused to execute script from 'http://localhost:3010/static/htmx.min.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled.\nmembers?name=Michelle+Gallagher&email=michelleg%40resedacouncil.org&phone=3109667838&board_position…:1 Refused to apply style from 'http://localhost:3010/static/styles.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled.\nmembers?name=Michelle+Gallagher&email=michelleg%40resedacouncil.org&phone=3109667838&board_position…:1 Refused to apply style from 'http://localhost:3010/static/styles.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled.\n",
       "serverErrors": "🔍 [DEBUG] Supabase query response: { data: { role: 'owner' }, error: null }\n🔍 [DEBUG] Returning role: owner\n📋 Fetching all agendas...\n✅ Found 0 agendas\n📋 Fetching all committees...\nError fetching committees: {\n  code: '42703',\n  details: null,\n  hint: 'Perhaps you meant to reference the column \"committees.zoom_id\".',\n  message: 'column committees.org_id does not exist'\n}\n❌ Error fetching committees: {\n  code: '42703',\n  details: null,\n  hint: 'Perhaps you meant to reference the column \"committees.zoom_id\".',\n  message: 'column committees.org_id does not exist'\n}\n📋 Fetching members with search:  filter: all\nError fetching members: {\n  code: '42703',\n  details: null,\n  hint: null,\n  message: 'column members.org_id does not exist'\n}\n❌ Members list error: {\n  code: '42703',\n  details: null,\n  hint: null,\n  message: 'column members.org_id does not exist'\n}\n📋 Fetching members with search:  filter: all\nError fetching members: {\n  code: '42703',\n  details: null,\n  hint: null,\n  message: 'column members.org_id does not exist'\n}\n❌ Members list error: {\n  code: '42703',\n  details: null,\n  hint: null,\n  message: 'column members.org_id does not exist'\n}",
       "description": "",
-      "status": "fixed",
-      "priority": "high",
+      "status": "open",
+      "priority": null,
       "relatedTickets": [],
-      "swarmActions": [
-        {
-          "timestamp": "2025-11-04T00:28:54.103Z",
-          "agent": "queen-coordinator",
-          "action": "Fixed schema column mismatch across 4 files",
-          "result": "FIXED - Session 10: Replaced all 21 occurrences of org_id with organization_id across supabase-client.js (9), graphics.js (4), agendas.js (5), minutes.js (2). Members, committees, stakeholders routes should now work. See /docs/sessions/SESSION_10_HANDOFF.md"
-        }
-      ],
-      "namespace": "config/supabase-client",
+      "swarmActions": [],
+      "namespace": null,
       "createdAt": "2025-11-03T19:00:08.830Z",
-      "updatedAt": "2025-11-04T00:28:54.104Z"
+      "updatedAt": "2025-11-03T19:00:08.830Z"
     },
     {
       "id": "TKT-1762196484974",
@@ -461,22 +433,13 @@
       "f12Errors": "committees:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)\nRefused to connect to 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js.map' because it violates the following Content Security Policy directive: \"connect-src 'self' https://edxcvppawhiyuhrnzxjm.supabase.co\".\n\nRefused to connect to 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css.map' because it violates the following Content Security Policy directive: \"connect-src 'self' https://edxcvppawhiyuhrnzxjm.supabase.co\".\n\n",
       "serverErrors": "📋 Fetching all committees...\nError fetching committees: {\n  code: '42703',\n  details: null,\n  hint: 'Perhaps you meant to reference the column \"committees.zoom_id\".',\n  message: 'column committees.org_id does not exist'\n}\n❌ Error fetching committees: {\n  code: '42703',\n  details: null,\n  hint: 'Perhaps you meant to reference the column \"committees.zoom_id\".',\n  message: 'column committees.org_id does not exist'\n}",
       "description": "",
-      "status": "fixed",
-      "priority": "high",
-      "relatedTickets": [
-        "TKT-1762196408830"
-      ],
-      "swarmActions": [
-        {
-          "timestamp": "2025-11-04T00:28:54.104Z",
-          "agent": "queen-coordinator",
-          "action": "Duplicate of TKT-1762196408830 - same org_id fix",
-          "result": "FIXED - Session 10: This ticket is a duplicate. The org_id → organization_id fix applied to TKT-1762196408830 resolves this as well."
-        }
-      ],
-      "namespace": "config/supabase-client",
+      "status": "open",
+      "priority": null,
+      "relatedTickets": [],
+      "swarmActions": [],
+      "namespace": null,
       "createdAt": "2025-11-03T19:01:24.974Z",
-      "updatedAt": "2025-11-04T00:28:54.104Z"
+      "updatedAt": "2025-11-03T19:01:24.974Z"
     },
     {
       "id": "TKT-1762196606883",
@@ -484,49 +447,27 @@
       "f12Errors": "(index):64 cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation\n(anonymous) @ (index):64\n(anonymous) @ (index):64\nstakeholders?first_name=Anna&last_name=Measles&email=&phone=&organization=&role=&notes=:8  GET http://localhost:3010/static/htmx.min.js net::ERR_ABORTED 404 (Not Found)\nstakeholders?first_name=Anna&last_name=Measles&email=&phone=&organization=&role=&notes=:1 Refused to execute script from 'http://localhost:3010/static/htmx.min.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled.\nstakeholders?first_name=Anna&last_name=Measles&email=&phone=&organization=&role=&notes=:1 Refused to apply style from 'http://localhost:3010/static/styles.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled.\n",
       "serverErrors": "}\n📋 Fetching stakeholders with search:  filter: all\n✅ Found 0 stakeholders\n📋 Fetching stakeholders with search:  filter: all\n✅ Found 0 stakeholders",
       "description": "Trying to add Stakeholder to table",
-      "status": "fixed",
-      "priority": "medium",
+      "status": "open",
+      "priority": null,
       "relatedTickets": [],
-      "swarmActions": [
-        {
-          "timestamp": "2025-11-04T00:28:54.104Z",
-          "agent": "analyst",
-          "action": "Identified static file path issue",
-          "result": "NEEDS FIX - Session 10: Stakeholders view uses incorrect paths (/static/htmx.min.js and /static/styles.css). Should be /js/htmx.min.js and /css/styles.css. Simple find/replace in stakeholders.ejs. Est: 15 min."
-        },
-        {
-          "timestamp": "2025-11-04T01:10:00.000Z",
-          "session": 12,
-          "agent": "coder",
-          "action": "Fixed static file paths in stakeholders view",
-          "result": "FIXED - Session 12: Corrected lines 8-9 in views/pages/stakeholders.ejs. Changed /static/htmx.min.js to /js/htmx.min.js and /static/styles.css to /css/styles.css. Stakeholders page should now load HTMX and styles correctly."
-        }
-      ],
-      "namespace": "views/pages/stakeholders",
+      "swarmActions": [],
+      "namespace": null,
       "createdAt": "2025-11-03T19:03:26.883Z",
-      "updatedAt": "2025-11-04T01:12:30.000Z"
+      "updatedAt": "2025-11-03T19:03:26.883Z"
     },
     {
       "id": "TKT-1762196745653",
       "route": "http://localhost:3010/dashboard",
       "f12Errors": "None - Document uploaded still not appearing in Documents list Recent Documents or All Documents",
       "serverErrors": "None - Document uploaded still not appearing in Documents list Recent Documents or All Documents",
-      "description": "DUPLICATE - Same issue as TKT-1762188267474 which was fixed in Session 9. Closing as duplicate.",
-      "status": "closed",
-      "priority": "high",
-      "relatedTickets": ["TKT-1762188267474"],
-      "swarmActions": [
-        {
-          "timestamp": "2025-11-04T01:12:30.000Z",
-          "session": 12,
-          "agent": "queen-coordinator",
-          "action": "Identified as duplicate ticket",
-          "result": "DUPLICATE - Session 12: This ticket describes the same issue as TKT-1762188267474 (document not appearing in Recent Documents after upload). That ticket was fixed in Session 9 by adding 'await Dashboard.loadDocuments();' at public/js/dashboard.js:468. Closing this as duplicate."
-        }
-      ],
-      "namespace": "frontend/dashboard",
+      "description": "",
+      "status": "open",
+      "priority": null,
+      "relatedTickets": [],
+      "swarmActions": [],
+      "namespace": null,
       "createdAt": "2025-11-03T19:05:45.653Z",
-      "updatedAt": "2025-11-04T01:12:30.000Z"
+      "updatedAt": "2025-11-03T19:05:45.653Z"
     },
     {
       "id": "TKT-1762196915214",
@@ -534,65 +475,13 @@
       "f12Errors": "N/A - I am adding this ticket because it appears we have STILL not pulled document parsing over from \"C:\\Users\\mgall\\OneDrive\\Desktop\\BYLAWSCOMMITTEE\\BYLAWSTOOL_Generalized\\src\\parsers\"",
       "serverErrors": "N/A - I am adding this ticket because it appears we have STILL not pulled document parsing over from \"C:\\Users\\mgall\\OneDrive\\Desktop\\BYLAWSCOMMITTEE\\BYLAWSTOOL_Generalized\\src\\parsers\"",
       "description": "This can't be deferred please task an agent now",
-      "status": "in-progress",
-      "priority": "high",
+      "status": "open",
+      "priority": null,
       "relatedTickets": [],
-      "swarmActions": [
-        {
-          "timestamp": "2025-11-04T00:28:54.104Z",
-          "agent": "coder",
-          "action": "Parser Migration Phase 1 COMPLETE",
-          "result": "PHASE 1 COMPLETE - Session 10: Migrated all 5 parsers (3,494 lines): numberingSchemes.js, hierarchyDetector.js, textParser.js, wordParser.js, markdownParser.js. Created parserUtils.js (337 lines). 45+ tests passing. Integration verified. Progress: 20% (Phase 1 of 5). Next: Phase 2 database integration. See /PARSER_MIGRATION_PHASE1_HANDOFF.md and /docs/parsers/"
-        },
-        {
-          "timestamp": "2025-11-04T01:12:30.000Z",
-          "session": 12,
-          "agent": "researcher",
-          "action": "Phase 2 Readiness Assessment COMPLETE",
-          "result": "READY FOR PHASE 2 - Session 12: Comprehensive assessment confirms all prerequisites met. Phase 1 verified (3,494 lines, 45+ tests). Database ready. Upload workflow functional. RLS fixed. Zero blockers. Confidence: HIGH (95%). Success probability: 90%+. Estimated time: 2-3 hours. Recommendation: GO. See /docs/parsers/PHASE_2_READINESS_ASSESSMENT.md"
-        }
-      ],
-      "namespace": "services/parsers",
+      "swarmActions": [],
+      "namespace": null,
       "createdAt": "2025-11-03T19:08:35.214Z",
-      "updatedAt": "2025-11-04T01:12:30.000Z"
-    },
-    {
-      "id": "TKT-1762197080119",
-      "route": "/dashboard",
-      "f12Errors": "mobile-menu.js:192 Mobile menu initialized\naccessibility-keyboard.js:293 ✓ Accessibility keyboard navigation loaded\ntooltips.js:29 [Tooltips] Initialized 4 tooltips\ndashboard/api/documents/create:1  Failed to load resource: the server responded with a status of 400 (Bad Request)\ndashboard.js?v=2:478 Error creating document: Error: new row violates row-level security policy for table \"documents\"\n    at HTMLButtonElement.<anonymous> (dashboard.js?v=2:475:17)\n(anonymous) @ dashboard.js?v=2:478\nRefused to connect to 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js.map' because it violates the following Content Security Policy directive: \"connect-src 'self' https://edxcvppawhiyuhrnzxjm.supabase.co\".\n\nRefused to connect to 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css.map' because it violates the following Content Security Policy directive: \"connect-src 'self' https://edxcvppawhiyuhrnzxjm.supabase.co\".\n\n",
-      "serverErrors": "  organizationId: '82d3f028-641a-44f3-aa83-3fe8b84402a7'\n}\n🔍 [DEBUG] Supabase query response: { data: { role: 'owner' }, error: null }\n🔍 [DEBUG] Returning role: owner\n[DocumentService] Error creating document: {\n  code: '42501',\n  details: null,\n  hint: null,\n  message: 'new row violates row-level security policy for table \"documents\"'\n}",
-      "description": "Tried to create document.\nMaybe give human a supabase qry to see what the security policies are.",
-      "status": "fixed",
-      "priority": "critical",
-      "relatedTickets": [
-        "TKT-1762188528841"
-      ],
-      "swarmActions": [
-        {
-          "timestamp": "2025-11-04T00:28:54.104Z",
-          "agent": "DETECTIVE",
-          "action": "Root cause investigation complete",
-          "result": "IN PROGRESS - Session 10: DETECTIVE found service role client bypasses auth.uid(). Created user-context client (src/utils/supabase-user-client.js). Migration 015 applied (RLS policies). However, RLS still failing. Next: Debug JWT token claims, verify auth.uid() evaluation. See /docs/investigation/RLS_POLICY_ROOT_CAUSE.md"
-        },
-        {
-          "timestamp": "2025-11-04T00:54:47.997Z",
-          "session": 11,
-          "agent": "queen-coordinator",
-          "action": "ROOT CAUSE FOUND - user_organizations RLS blocking subquery",
-          "result": "Created Migration 017 to add SELECT policy to user_organizations table. Debug endpoint revealed auth.uid() works but user_organizations subquery returns empty due to missing RLS policy. Migration 016 fixed documents policies to use correct table, Migration 017 allows users to read their own user_organizations records."
-        },
-        {
-          "timestamp": "2025-11-04T01:01:18.220Z",
-          "session": 11,
-          "agent": "queen-coordinator",
-          "action": "RLS FIXED - Document creation now works",
-          "result": "COMPLETE: Migration 016 fixed documents RLS to use user_organizations table. Migration 017 added SELECT policy to user_organizations. Root cause: user_organizations had RLS enabled but no SELECT policy, blocking the documents INSERT policy subquery. Debug endpoint revealed exact issue. Document creation now fully functional."
-        }
-      ],
-      "namespace": "database/rls",
-      "createdAt": "2025-11-03T19:11:20.119Z",
-      "updatedAt": "2025-11-04T00:28:54.104Z",
-      "resolution": "Applied migrations 016 and 017"
+      "updatedAt": "2025-11-03T19:08:35.214Z"
     }
   ]
 }

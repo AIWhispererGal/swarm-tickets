@@ -1,0 +1,30 @@
+# Don't publish test/development files
+node_modules/
+test/
+tests/
+*.test.js
+.git/
+.github/
+
+# Don't publish user's tickets
+tickets.json
+ticket-backups/
+
+# Don't publish editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Don't publish OS files
+.DS_Store
+Thumbs.db
+
+# Don't publish logs
+*.log
+npm-debug.log*
+
+# Don't publish temp files
+tmp/
+temp/

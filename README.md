@@ -1,357 +1,238 @@
-# Claude-flow Ticket Tracker 🎫
+# 🎫 Swarm Tickets
 
-A lightweight ticket tracking system for managing bugs, errors, and issues in your Claude-flow project.
+Lightweight ticket tracking system designed for AI-powered bug fixing workflows with Claude-flow/Claude Code.
 
-## Features
+Track bugs, errors, and issues in a simple JSON file that both humans and AI agents can read and update. Perfect for projects where you want Claude to autonomously fix tickets.
 
-- 📝 Quick ticket submission with route, F12 errors, and server errors
-- 🔍 Filter and search tickets by status, priority, or keyword
-- 🤖 Swarm integration ready (priority assignment, related ticket detection)
-- 📊 Statistics dashboard
-- 🎨 Clean, dark-themed UI
-- 💾 JSON file storage (easy to backup, version control, and integrate)
+## ✨ Features
 
-## Quick Start
+- 📝 **Simple JSON-based storage** - No database required
+- 🤖 **AI-friendly format** - Designed for Claude swarm workflows
+- 🎨 **Beautiful web UI** - View and manage tickets in your browser
+- 💾 **Automatic backups** - Never lose ticket history
+- 🔧 **RESTful API** - Integrate with any tool
+- ⚙️ **Configurable labels** - Customize field names for your project
+- 📋 **Quick prompt generation** - Copy Claude-ready prompts with one click
+- 🔄 **Auto port detection** - No conflicts with existing services
 
-### Option 1: Standalone HTML (No Server)
-
-Just open `ticket-tracker.html` in your browser. Data is stored in localStorage.
+## 📦 Installation
 
 ```bash
-open ticket-tracker.html
-# or
-firefox ticket-tracker.html
+npm install swarm-tickets
 ```
 
-### Option 2: Node.js Server (Recommended)
+After installation, the package will automatically set up:
+- `.claude/skills/swarm-tickets/` - Claude skill documentation
+- `ticket-tracker.html` - Web interface (in your project root)
+- `tickets.json` - Ticket storage file
 
-1. Install dependencies:
+## 🚀 Quick Start
+
+### 1. Start the server
+
 ```bash
-npm install
+npx swarm-tickets
 ```
 
-2. Start the server:
+This starts the API server on port 3456 (or next available port).
+
+### 2. Open the web UI
+
+Navigate to `http://localhost:3456/ticket-tracker.html`
+
+### 3. Create your first ticket
+
+Use the web UI or API:
+
 ```bash
-npm start
+curl -X POST http://localhost:3456/api/tickets \
+  -H "Content-Type: application/json" \
+  -d '{
+    "route": "/dashboard/users",
+    "f12Errors": "TypeError: Cannot read property...",
+    "serverErrors": "Error connecting to database",
+    "description": "User list not loading",
+    "status": "open"
+  }'
 ```
 
-3. Open http://localhost:3456/ticket-tracker.html
+### 4. Let Claude fix it
 
-## Usage
+Click the "📋 Quick Prompt" button on any ticket, paste into Claude Code/flow, and watch it work!
 
-### Web UI
+## 🤖 Using with Claude
 
-1. **Submit Tab**: Create new tickets with route, errors, and description
-2. **View Tab**: See all tickets with filtering and search capabilities
+The package includes a Claude skill that teaches Claude how to:
+- Read and update tickets from `tickets.json`
+- Set priorities and track related tickets
+- Add swarm actions documenting fixes
+- Update status as work progresses
 
-### CLI Tool
+Just reference the ticket ID in your prompt:
 
-Create a ticket from command line:
+```
+Please investigate and fix ticket TKT-1234567890
+```
+
+Claude will:
+1. Read the ticket details from `tickets.json`
+2. Investigate the errors
+3. Fix the issue
+4. Update the ticket with status and actions taken
+
+## ⚙️ Configuration
+
+### Custom Project Name & Labels
+
+Go to Settings in the web UI to customize:
+- Project name
+- Field labels (e.g., "Location" instead of "Route/Webpage")
+- Error section names
+- Quick prompt template
+
+Settings are saved to localStorage and persist across sessions.
+
+### Custom Port
+
 ```bash
-npm run ticket
-# or
-node ticket-cli.js
+PORT=4000 npx swarm-tickets
 ```
 
-List all tickets:
-```bash
-node ticket-cli.js list
-```
+Or the server will automatically find the next available port if 3456 is busy.
 
-## API Endpoints
-
-If using the Node.js server:
+## 📖 API Reference
 
 ### Get all tickets
-```bash
-GET http://localhost:3456/api/tickets
+```
+GET /api/tickets
 ```
 
-### Create a ticket
-```bash
-POST http://localhost:3456/api/tickets
+### Get single ticket
+```
+GET /api/tickets/:id
+```
+
+### Create ticket
+```
+POST /api/tickets
 Content-Type: application/json
 
 {
-  "route": "/dashboard/users",
-  "f12Errors": "TypeError: Cannot read property 'id' of undefined",
-  "serverErrors": "Error: Database connection failed",
-  "description": "User page crashes on load",
-  "status": "open"
+  "route": "/page/path",
+  "f12Errors": "Browser console errors",
+  "serverErrors": "Server console errors", 
+  "description": "Optional description",
+  "status": "open|in-progress|fixed|closed"
 }
 ```
 
-### Update a ticket
-```bash
-PATCH http://localhost:3456/api/tickets/TKT-1234567890
+### Update ticket
+```
+PATCH /api/tickets/:id
 Content-Type: application/json
 
 {
   "status": "fixed",
-  "priority": "high"
+  "priority": "high",
+  "namespace": "components/UserList",
+  "swarmActions": [...]
 }
 ```
 
 ### Add swarm action
-```bash
-POST http://localhost:3456/api/tickets/TKT-1234567890/swarm-action
+```
+POST /api/tickets/:id/swarm-action
 Content-Type: application/json
 
 {
-  "action": "Applied database migration fix",
-  "result": "Issue resolved"
+  "action": "Fixed null reference in UserList component",
+  "result": "Tested and verified working"
 }
 ```
 
-### Auto-analyze with swarm
-```bash
-POST http://localhost:3456/api/tickets/TKT-1234567890/analyze
+### Delete ticket
+```
+DELETE /api/tickets/:id
 ```
 
-This will:
-- Assign priority based on error severity and route
-- Find related tickets on the same route
-- Add a swarm action log entry
-
-### Get statistics
-```bash
-GET http://localhost:3456/api/stats
+### Get stats
+```
+GET /api/stats
 ```
 
-## Data Structure
+## 📁 File Structure
 
-Tickets are stored in `tickets.json`:
-
-```json
-{
-  "tickets": [
-    {
-      "id": "TKT-1234567890",
-      "route": "/dashboard/users",
-      "f12Errors": "TypeError: Cannot read property...",
-      "serverErrors": "Error: Database connection failed",
-      "description": "User page crashes on load",
-      "status": "open",
-      "priority": "high",
-      "relatedTickets": ["TKT-1234567891"],
-      "swarmActions": [
-        {
-          "timestamp": "2025-11-02T10:30:00.000Z",
-          "action": "auto-analysis",
-          "result": "Priority set to high"
-        }
-      ],
-      "namespace": "user-management",
-      "createdAt": "2025-11-02T10:00:00.000Z",
-      "updatedAt": "2025-11-02T10:30:00.000Z"
-    }
-  ]
-}
-```
-
-## Integration with Claude-flow
-
-### From your app:
-
-```javascript
-// Quick ticket submission
-async function reportBug(route, f12Errors, serverErrors) {
-  await fetch('http://localhost:3456/api/tickets', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ route, f12Errors, serverErrors })
-  });
-}
-
-// In your error handler:
-window.onerror = (msg, url, line, col, error) => {
-  reportBug(
-    window.location.pathname,
-    `${msg} at ${url}:${line}:${col}\n${error.stack}`,
-    ''
-  );
-};
-```
-
-### Swarm integration:
-
-```javascript
-// Let swarm analyze and prioritize tickets
-const tickets = await fetch('http://localhost:3456/api/tickets').then(r => r.json());
-
-for (const ticket of tickets.filter(t => !t.priority)) {
-  await fetch(`http://localhost:3456/api/tickets/${ticket.id}/analyze`, {
-    method: 'POST'
-  });
-}
-```
-
-## Field Descriptions
-
-- **route**: The webpage/route where the error occurred
-- **f12Errors**: Browser console errors from DevTools
-- **serverErrors**: Server-side console errors
-- **description**: Additional context or reproduction steps
-- **status**: open | in-progress | fixed | closed
-- **priority**: critical | high | medium | low (can be auto-assigned by swarm)
-- **relatedTickets**: Array of related ticket IDs
-- **swarmActions**: Log of automated actions taken by your swarm
-- **namespace**: Categorization for fixes (e.g., "auth", "database", "ui")
-
-## Tips
-
-1. **Use the CLI** for quick ticket creation while debugging
-2. **Auto-analyze** tickets to let the swarm assign priorities and find relationships
-3. **Track namespaces** to document where fixes were applied
-4. **Export tickets.json** regularly for backup or CI/CD integration
-5. **Search by error message** to find similar issues quickly
-
-## Swarm Integration
-
-Add this to your swarm prompts when working on Claude-flow:
+After installation:
 
 ```
-TICKET TRACKER CONTEXT:
-
-You have access to a ticket tracking system at ./tickets.json
-
-Current ticket structure:
-- id: unique identifier (TKT-timestamp)
-- route: webpage/route where error occurred
-- f12Errors: browser console errors
-- serverErrors: server-side errors
-- description: additional context
-- status: open | in-progress | fixed | closed
-- priority: critical | high | medium | low (or null)
-- relatedTickets: array of related ticket IDs
-- swarmActions: array of {timestamp, action, result}
-- namespace: where fixes were applied
-- createdAt, updatedAt: ISO timestamps
-
-INSTRUCTIONS:
-1. Check tickets.json for open tickets before starting work
-2. When fixing a ticket, update its status to "in-progress"
-3. Add entries to swarmActions documenting what you did
-4. Set priority if not already set (critical/high/medium/low)
-5. Link related tickets by adding their IDs to relatedTickets array
-6. Set namespace to document where fixes were applied (e.g., "auth", "database", "api/users")
-7. When done, set status to "fixed" with final swarmAction entry
-8. If you can't fix it, add a swarmAction explaining why and set priority
-
-BEFORE modifying tickets.json, ALWAYS create a backup in tickets.backup.json
+your-project/
+├── .claude/
+│   └── skills/
+│       └── swarm-tickets/
+│           └── SKILL.md          # Claude skill documentation
+├── ticket-backups/               # Automatic backups (last 10)
+├── ticket-tracker.html           # Web UI
+├── tickets.json                  # Your tickets
+└── node_modules/
+    └── swarm-tickets/
 ```
 
-### Example Swarm Workflow
+## 🔧 Local Development
 
-```javascript
-// 1. Read tickets
-const data = JSON.parse(await fs.readFile('tickets.json', 'utf8'));
-
-// 2. Find open tickets
-const openTickets = data.tickets.filter(t => t.status === 'open');
-
-// 3. Work on a ticket
-const ticket = openTickets[0];
-ticket.status = 'in-progress';
-ticket.swarmActions.push({
-  timestamp: new Date().toISOString(),
-  action: 'Started investigating database connection error',
-  result: null
-});
-
-// 4. After fixing
-ticket.status = 'fixed';
-ticket.namespace = 'database/connection';
-ticket.swarmActions.push({
-  timestamp: new Date().toISOString(),
-  action: 'Added connection retry logic and proper error handling',
-  result: 'Fixed - tested with 3 connection failures, all recovered successfully'
-});
-ticket.updatedAt = new Date().toISOString();
-
-// 5. Write back
-await fs.writeFile('tickets.json', JSON.stringify(data, null, 2));
-```
-
-## Backups
-
-**The Node.js server automatically creates backups before every write!**
-
-Every time tickets.json is modified via the API or server, it:
-1. Creates `tickets.backup.json` (latest backup)
-2. Creates timestamped backup in `ticket-backups/`
-3. Keeps last 20 timestamped backups, deletes older ones
-
-So if the swarm overwrites something, you've got backups.
-
-### Manual Backups
-
-Use the backup script before letting swarm work:
+Testing the package locally before publishing:
 
 ```bash
-#!/bin/bash
-# backup-tickets.sh
-BACKUP_DIR="./ticket-backups"
-mkdir -p $BACKUP_DIR
-cp tickets.json "$BACKUP_DIR/tickets-$(date +%Y%m%d-%H%M%S).json"
+# In your test project
+npm install /path/to/swarm-tickets
 
-# Keep only last 20 backups
-ls -t $BACKUP_DIR/tickets-*.json | tail -n +21 | xargs -r rm
+# If files weren't copied automatically (local install issue)
+node node_modules/swarm-tickets/setup.js
+
+# Start the server
+npx swarm-tickets
 ```
 
-Run it as a cron job:
-```bash
-# Every hour
-0 * * * * cd /path/to/ticket-tracker && ./backup-tickets.sh
+## 🗑️ .gitignore
+
+Add to your `.gitignore` if you don't want to commit tickets:
+
 ```
-
-Or manually before letting swarm work:
-```bash
-cp tickets.json tickets.backup.json
-```
-
-### Git-based Backups
-
-Add tickets.json to git and commit after significant changes:
-
-```bash
-git add tickets.json
-git commit -m "Update tickets: 3 fixed, 2 new"
-git push
-```
-
-**Important:** Add to `.gitignore` if tickets contain sensitive info:
-```
-# But DO track the structure
 tickets.json
-
-# Keep the example
-!tickets.example.json
+ticket-backups/
 ```
 
-### Recovery
+## 📜 License
 
-If swarm overwrites everything:
+MIT
+
+## 🤝 Contributing
+
+Built for the Claude community! Issues and PRs welcome.
+
+## 💡 Tips
+
+- Use the **Quick Prompt** button to generate Claude-ready prompts
+- Set **priorities** to help Claude focus on critical issues first
+- Add **swarm actions** to document what was fixed and how
+- Use **namespaces** to track which files/components were modified
+- Link **related tickets** to help Claude understand patterns
+
+## 🐛 Troubleshooting
+
+### Postinstall script didn't run (local install)
 ```bash
-# From manual backup
-cp tickets.backup.json tickets.json
-
-# From timestamped backup
-cp ticket-backups/tickets-20251102-143022.json tickets.json
-
-# From git
-git checkout HEAD~1 tickets.json
+node node_modules/swarm-tickets/setup.js
 ```
 
-## Customization
+### Port 3456 is busy
+The server will automatically find the next available port. Or set a custom port:
+```bash
+PORT=4000 npx swarm-tickets
+```
 
-The system is intentionally minimal. Extend it by:
+### Files not showing up
+Make sure you're in your project directory when running `npx swarm-tickets`. The server looks for `tickets.json` in the current directory.
 
-- Adding more fields to the ticket structure
-- Creating custom swarm analysis logic in the `/analyze` endpoint
-- Building dashboards or reports from `tickets.json`
-- Integrating with GitHub Issues, Jira, etc.
+---
 
-## License
-
-MIT - Use it however you want!
+Made with ❤️ for Claude-powered development workflows

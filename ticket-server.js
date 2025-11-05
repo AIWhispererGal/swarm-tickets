@@ -1,17 +1,45 @@
+#!/usr/bin/env node
+
 const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3456;
-const TICKETS_FILE = path.join(__dirname, 'tickets.json');
-const BACKUP_FILE = path.join(__dirname, 'tickets.backup.json');
-const BACKUP_DIR = path.join(__dirname, 'ticket-backups');
+const PORT = process.env.PORT || 3456;
+
+// When installed as package, look for tickets.json in the project root (cwd)
+// When run standalone, look in the same directory as the script
+const projectRoot = process.cwd();
+const TICKETS_FILE = path.join(projectRoot, 'tickets.json');
+const BACKUP_DIR = path.join(projectRoot, 'ticket-backups');
+
+// Serve static files from the package directory (where ticket-tracker.html is)
+const packageDir = __dirname;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.static(projectRoot)); // Serve from project root first
+app.use(express.static(packageDir));  // Fall back to package directory
+
+// Auto-find available port
+async function findAvailablePort(startPort) {
+    const net = require('net');
+    
+    return new Promise((resolve) => {
+        const server = net.createServer();
+        server.unref();
+        server.on('error', () => {
+            resolve(findAvailablePort(startPort + 1));
+        });
+        server.listen(startPort, () => {
+            const { port } = server.address();
+            server.close(() => {
+                resolve(port);
+            });
+        });
+    });
+}
 
 // Initialize tickets file if it doesn't exist
 async function initTicketsFile() {
@@ -45,23 +73,20 @@ async function createBackup() {
         // Check if tickets.json exists
         await fs.access(TICKETS_FILE);
         
-        // Copy to simple backup
-        await fs.copyFile(TICKETS_FILE, BACKUP_FILE);
-        
-        // Also create timestamped backup
+        // Create timestamped backup in folder
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const timestampedBackup = path.join(BACKUP_DIR, `tickets-${timestamp}.json`);
         await fs.copyFile(TICKETS_FILE, timestampedBackup);
         
-        // Rotate backups - keep last 20
+        // Rotate backups - keep last 10
         const files = await fs.readdir(BACKUP_DIR);
         const backupFiles = files
             .filter(f => f.startsWith('tickets-') && f.endsWith('.json'))
             .sort()
             .reverse();
         
-        if (backupFiles.length > 20) {
-            for (let i = 20; i < backupFiles.length; i++) {
+        if (backupFiles.length > 10) {
+            for (let i = 10; i < backupFiles.length; i++) {
                 await fs.unlink(path.join(BACKUP_DIR, backupFiles[i]));
             }
         }
@@ -287,9 +312,16 @@ app.get('/api/stats', async (req, res) => {
 });
 
 // Initialize and start server
-initTicketsFile().then(() => {
-    app.listen(PORT, () => {
-        console.log(`🎫 Ticket Tracker API running on http://localhost:${PORT}`);
-        console.log(`📊 Open http://localhost:${PORT}/ticket-tracker.html to view the UI`);
+initTicketsFile().then(async () => {
+    const availablePort = await findAvailablePort(PORT);
+    
+    app.listen(availablePort, () => {
+        console.log(`🎫 Ticket Tracker API running on http://localhost:${availablePort}`);
+        console.log(`📊 Open http://localhost:${availablePort}/ticket-tracker.html to view the UI`);
+        console.log(`📁 Tickets stored at: ${TICKETS_FILE}`);
+        
+        if (availablePort !== PORT) {
+            console.log(`⚠️  Port ${PORT} was busy, using port ${availablePort} instead`);
+        }
     });
 });

@@ -1,6 +1,6 @@
 {
   "name": "swarm-tickets",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lightweight ticket tracking system for AI-powered bug fixing with Claude-flow/Claude Code",
   "main": "ticket-server.js",
   "bin": {

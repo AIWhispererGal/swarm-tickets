@@ -12,7 +12,8 @@ const { createStorageAdapter, getStorageConfig } = require('./lib/storage');
 
 // Handle CLI commands before starting server
 const args = process.argv.slice(2);
-if (args[0] === 'migrate') {
+
+function runMigration() {
   const { migrate } = require('./lib/migrate');
   const toIndex = args.indexOf('--to');
   const target = toIndex !== -1 ? args[toIndex + 1] : null;
@@ -32,7 +33,9 @@ if (args[0] === 'migrate') {
     console.error('Migration failed:', err);
     process.exit(1);
   });
-} else if (args[0] === 'help' || args[0] === '--help' || args[0] === '-h') {
+}
+
+function showHelp() {
   console.log('\n🎫 Swarm Tickets - Bug tracking for AI-powered development\n');
   console.log('Usage: npx swarm-tickets [command]\n');
   console.log('Commands:');
@@ -47,6 +50,15 @@ if (args[0] === 'migrate') {
   console.log('  SUPABASE_ANON_KEY          Supabase anonymous key');
   console.log('  SUPABASE_SERVICE_ROLE_KEY  Supabase service role key\n');
   process.exit(0);
+}
+
+// Check if running CLI command (don't start server)
+const isCliCommand = args[0] === 'migrate' || args[0] === 'help' || args[0] === '--help' || args[0] === '-h';
+
+if (args[0] === 'migrate') {
+  runMigration();
+} else if (args[0] === 'help' || args[0] === '--help' || args[0] === '-h') {
+  showHelp();
 }
 
 const app = express();
@@ -525,4 +537,7 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
-start();
+// Only start server if not running a CLI command
+if (!isCliCommand) {
+  start();
+}

@@ -1,6 +1,6 @@
 {
   "name": "swarm-tickets",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "description": "Lightweight ticket tracking system for AI-powered bug fixing with Claude-flow/Claude Code. Supports JSON, SQLite, and Supabase storage.",
   "main": "ticket-server.js",
   "bin": {

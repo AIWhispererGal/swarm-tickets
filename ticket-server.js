@@ -10,6 +10,45 @@ const path = require('path');
 const cors = require('cors');
 const { createStorageAdapter, getStorageConfig } = require('./lib/storage');
 
+// Handle CLI commands before starting server
+const args = process.argv.slice(2);
+if (args[0] === 'migrate') {
+  const { migrate } = require('./lib/migrate');
+  const toIndex = args.indexOf('--to');
+  const target = toIndex !== -1 ? args[toIndex + 1] : null;
+
+  if (!target) {
+    console.log('\nUsage: npx swarm-tickets migrate --to <target>\n');
+    console.log('Targets:');
+    console.log('  sqlite    - Migrate to local SQLite database');
+    console.log('  supabase  - Migrate to Supabase (requires env vars)\n');
+    console.log('Examples:');
+    console.log('  npx swarm-tickets migrate --to sqlite');
+    console.log('  npx swarm-tickets migrate --to supabase\n');
+    process.exit(0);
+  }
+
+  migrate(target).then(() => process.exit(0)).catch(err => {
+    console.error('Migration failed:', err);
+    process.exit(1);
+  });
+} else if (args[0] === 'help' || args[0] === '--help' || args[0] === '-h') {
+  console.log('\n🎫 Swarm Tickets - Bug tracking for AI-powered development\n');
+  console.log('Usage: npx swarm-tickets [command]\n');
+  console.log('Commands:');
+  console.log('  (none)              Start the ticket server');
+  console.log('  migrate --to <db>   Migrate tickets from JSON to sqlite/supabase');
+  console.log('  help                Show this help message\n');
+  console.log('Environment Variables:');
+  console.log('  PORT                       Server port (default: 3456)');
+  console.log('  SWARM_TICKETS_STORAGE      Storage type: json, sqlite, supabase');
+  console.log('  SWARM_TICKETS_SQLITE_PATH  SQLite database path');
+  console.log('  SUPABASE_URL               Supabase project URL');
+  console.log('  SUPABASE_ANON_KEY          Supabase anonymous key');
+  console.log('  SUPABASE_SERVICE_ROLE_KEY  Supabase service role key\n');
+  process.exit(0);
+}
+
 const app = express();
 const PORT = process.env.PORT || 3456;
 

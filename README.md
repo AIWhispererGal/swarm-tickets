@@ -199,6 +199,46 @@ CREATE INDEX IF NOT EXISTS idx_swarm_actions_ticket_id ON swarm_actions(ticket_i
 CREATE INDEX IF NOT EXISTS idx_comments_ticket_id ON comments(ticket_id);
 ```
 
+## 🔄 Migrating Existing Tickets
+
+Already have tickets in JSON and want to switch to SQLite or Supabase? Use the migration tool:
+
+### Migrate to SQLite
+
+```bash
+# Install SQLite dependency
+npm install better-sqlite3
+
+# Run migration
+npx swarm-tickets migrate --to sqlite
+```
+
+### Migrate to Supabase
+
+```bash
+# Install Supabase dependency
+npm install @supabase/supabase-js
+
+# Set environment variables
+export SUPABASE_URL=https://your-project.supabase.co
+export SUPABASE_ANON_KEY=your-anon-key
+
+# Run migration (create tables first - see Supabase setup above)
+npx swarm-tickets migrate --to supabase
+```
+
+The migration tool:
+- Preserves ticket IDs, timestamps, and all data
+- Skips tickets that already exist in the target
+- Leaves your original `tickets.json` unchanged
+- Shows a summary of migrated/skipped/failed tickets
+
+After migration, start using the new storage:
+```bash
+export SWARM_TICKETS_STORAGE=sqlite  # or supabase
+npx swarm-tickets
+```
+
 ## 🤖 Using with Claude
 
 The package includes a Claude skill that teaches Claude how to:

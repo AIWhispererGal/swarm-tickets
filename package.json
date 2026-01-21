@@ -1,7 +1,7 @@
 {
   "name": "swarm-tickets",
-  "version": "1.0.1",
-  "description": "Lightweight ticket tracking system for AI-powered bug fixing with Claude-flow/Claude Code",
+  "version": "2.0.0",
+  "description": "Lightweight ticket tracking system for AI-powered bug fixing with Claude-flow/Claude Code. Supports JSON, SQLite, and Supabase storage.",
   "main": "ticket-server.js",
   "bin": {
     "swarm-tickets": "./ticket-server.js"
@@ -15,9 +15,11 @@
     "ticket-server.js",
     "ticket-cli.js",
     "ticket-tracker.html",
+    "bug-report-widget.js",
     "backup-tickets.sh",
     "tickets.example.json",
     "setup.js",
+    "lib/",
     "SKILL.md",
     "README.md",
     "LICENSE"
@@ -32,21 +34,28 @@
     "claude-code",
     "ai",
     "automation",
-    "development-tools"
+    "development-tools",
+    "sqlite",
+    "supabase",
+    "bug-report"
   ],
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5"
   },
-"repository": {
-  "type": "git",
-  "url": "git+https://github.com/AIWhispererGal/swarm-tickets.git"
-},
-"bugs": {
-  "url": "https://github.com/AIWhispererGal/swarm-tickets/issues"
-},
-"homepage": "https://github.com/AIWhispererGal/swarm-tickets#readme",
-  "author": "AIWhispererGal and Claude Sonnet 4.5",
+  "optionalDependencies": {
+    "better-sqlite3": "^9.4.0",
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AIWhispererGal/swarm-tickets.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AIWhispererGal/swarm-tickets/issues"
+  },
+  "homepage": "https://github.com/AIWhispererGal/swarm-tickets#readme",
+  "author": "AIWhispererGal and Claude",
   "license": "MIT",
   "engines": {
     "node": ">=14.0.0"

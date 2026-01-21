@@ -2,13 +2,15 @@
 
 Lightweight ticket tracking system designed for AI-powered bug fixing workflows with Claude-flow/Claude Code.
 
-Track bugs, errors, and issues in a simple JSON file that both humans and AI agents can read and update. Perfect for projects where you want Claude to autonomously fix tickets.
+Track bugs, errors, and issues that both humans and AI agents can read and update. Perfect for projects where you want Claude to autonomously fix tickets.
 
 ## ✨ Features
 
-- 📝 **Simple JSON-based storage** - No database required
+- 📝 **Multiple storage backends** - JSON, SQLite, or Supabase
 - 🤖 **AI-friendly format** - Designed for Claude swarm workflows
 - 🎨 **Beautiful web UI** - View and manage tickets in your browser
+- 💬 **Comment system** - Human and AI collaboration on tickets
+- 🐛 **Bug Report Widget** - Embeddable widget for end-user bug reports
 - 💾 **Automatic backups** - Never lose ticket history
 - 🔧 **RESTful API** - Integrate with any tool
 - ⚙️ **Configurable labels** - Customize field names for your project
@@ -60,12 +62,138 @@ curl -X POST http://localhost:3456/api/tickets \
 
 Click the "📋 Quick Prompt" button on any ticket, paste into Claude Code/flow, and watch it work!
 
+## 💾 Storage Options
+
+Swarm Tickets supports three storage backends:
+
+### JSON (Default)
+No configuration needed. Tickets are stored in `./tickets.json`.
+
+```bash
+# Explicit configuration (optional)
+export SWARM_TICKETS_STORAGE=json
+npx swarm-tickets
+```
+
+### SQLite (Local SQL)
+For better performance and query capabilities with a local database.
+
+```bash
+# Install optional dependency
+npm install better-sqlite3
+
+# Configure
+export SWARM_TICKETS_STORAGE=sqlite
+export SWARM_TICKETS_SQLITE_PATH=./tickets.db  # optional, default: ./tickets.db
+
+npx swarm-tickets
+```
+
+### Supabase (Cloud SQL)
+For team collaboration, cloud storage, and production deployments.
+
+```bash
+# Install optional dependency
+npm install @supabase/supabase-js
+
+# Configure
+export SWARM_TICKETS_STORAGE=supabase
+export SUPABASE_URL=https://your-project.supabase.co
+export SUPABASE_ANON_KEY=your-anon-key
+
+# Optional: For auto-table creation
+export SUPABASE_SERVICE_ROLE_KEY=your-service-key
+
+npx swarm-tickets
+```
+
+#### Supabase Manual Setup
+
+If you prefer to create tables manually (recommended for production):
+
+```sql
+-- Run this in your Supabase SQL Editor
+
+-- Main tickets table
+CREATE TABLE IF NOT EXISTS tickets (
+  id TEXT PRIMARY KEY,
+  route TEXT NOT NULL,
+  f12_errors TEXT DEFAULT '',
+  server_errors TEXT DEFAULT '',
+  description TEXT DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in-progress', 'fixed', 'closed')),
+  priority TEXT CHECK (priority IS NULL OR priority IN ('critical', 'high', 'medium', 'low')),
+  namespace TEXT,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- Related tickets junction table
+CREATE TABLE IF NOT EXISTS ticket_relations (
+  id SERIAL PRIMARY KEY,
+  ticket_id TEXT NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
+  related_ticket_id TEXT NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
+  UNIQUE(ticket_id, related_ticket_id)
+);
+
+-- Swarm actions log
+CREATE TABLE IF NOT EXISTS swarm_actions (
+  id SERIAL PRIMARY KEY,
+  ticket_id TEXT NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
+  timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+  action TEXT NOT NULL,
+  result TEXT
+);
+
+-- Comments table
+CREATE TABLE IF NOT EXISTS comments (
+  id TEXT PRIMARY KEY,
+  ticket_id TEXT NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
+  timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  type TEXT NOT NULL DEFAULT 'human' CHECK (type IN ('human', 'ai')),
+  author TEXT DEFAULT 'anonymous',
+  content TEXT DEFAULT '',
+  metadata JSONB DEFAULT '{}',
+  edited_at TIMESTAMP WITH TIME ZONE
+);
+
+-- API Keys for bug report widget
+CREATE TABLE IF NOT EXISTS api_keys (
+  id SERIAL PRIMARY KEY,
+  key TEXT UNIQUE NOT NULL,
+  name TEXT,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  last_used TIMESTAMP WITH TIME ZONE,
+  rate_limit INTEGER DEFAULT 100,
+  enabled BOOLEAN DEFAULT true
+);
+
+-- Rate limiting table
+CREATE TABLE IF NOT EXISTS rate_limits (
+  id SERIAL PRIMARY KEY,
+  identifier TEXT NOT NULL,
+  window_start TIMESTAMP WITH TIME ZONE NOT NULL,
+  request_count INTEGER DEFAULT 1,
+  UNIQUE(identifier, window_start)
+);
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
+CREATE INDEX IF NOT EXISTS idx_tickets_priority ON tickets(priority);
+CREATE INDEX IF NOT EXISTS idx_tickets_route ON tickets(route);
+CREATE INDEX IF NOT EXISTS idx_tickets_created_at ON tickets(created_at);
+CREATE INDEX IF NOT EXISTS idx_swarm_actions_ticket_id ON swarm_actions(ticket_id);
+CREATE INDEX IF NOT EXISTS idx_comments_ticket_id ON comments(ticket_id);
+```
+
 ## 🤖 Using with Claude
 
 The package includes a Claude skill that teaches Claude how to:
-- Read and update tickets from `tickets.json`
+- Read and update tickets
 - Set priorities and track related tickets
 - Add swarm actions documenting fixes
+- Add comments to discuss issues
+- Close and reopen tickets
 - Update status as work progresses
 
 Just reference the ticket ID in your prompt:
@@ -75,10 +203,96 @@ Please investigate and fix ticket TKT-1234567890
 ```
 
 Claude will:
-1. Read the ticket details from `tickets.json`
+1. Read the ticket details
 2. Investigate the errors
 3. Fix the issue
 4. Update the ticket with status and actions taken
+
+## 💬 Comments System
+
+Add comments to tickets for human-AI collaboration:
+
+```bash
+# Add a human comment
+curl -X POST http://localhost:3456/api/tickets/TKT-123/comments \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "human",
+    "author": "developer",
+    "content": "I think this is related to the auth refactor"
+  }'
+
+# Add an AI comment
+curl -X POST http://localhost:3456/api/tickets/TKT-123/comments \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "ai",
+    "author": "claude",
+    "content": "After analyzing the stack trace, this appears to be a null reference issue",
+    "metadata": {"analysisType": "stack-trace", "confidence": "high"}
+  }'
+```
+
+## 🐛 Bug Report Widget
+
+Let end-users report bugs directly from your application:
+
+### Embed the Widget
+
+```html
+<script src="https://your-server:3456/bug-report-widget.js"
+        data-endpoint="https://your-server:3456/api/bug-report"
+        data-api-key="stk_your_api_key"
+        data-position="bottom-right"
+        data-theme="dark">
+</script>
+```
+
+### Or Initialize Programmatically
+
+```javascript
+SwarmBugReport.init({
+  endpoint: 'https://your-server:3456/api/bug-report',
+  apiKey: 'stk_your_api_key',  // optional
+  position: 'bottom-right',     // bottom-right, bottom-left, top-right, top-left
+  theme: 'dark',                // dark or light
+  buttonText: 'Report Bug',
+  collectErrors: true           // auto-capture console errors
+});
+```
+
+### Widget Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `endpoint` | `/api/bug-report` | API endpoint URL |
+| `apiKey` | `null` | API key for authentication |
+| `position` | `bottom-right` | Widget position |
+| `theme` | `dark` | `dark` or `light` |
+| `buttonText` | `Report Bug` | Button label |
+| `buttonIcon` | `🐛` | Button icon |
+| `collectErrors` | `true` | Auto-capture console errors |
+| `maxErrors` | `10` | Max errors to collect |
+
+### Generate API Keys (SQLite/Supabase only)
+
+```bash
+# Create an API key
+curl -X POST http://localhost:3456/api/admin/api-keys \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Production Widget"}'
+
+# List API keys
+curl http://localhost:3456/api/admin/api-keys
+
+# Revoke an API key
+curl -X DELETE http://localhost:3456/api/admin/api-keys/stk_xxx
+```
+
+### Rate Limiting
+
+- With API key: 1000 requests per hour
+- Without API key: 10 requests per hour per IP
 
 ## ⚙️ Configuration
 
@@ -100,65 +314,54 @@ PORT=4000 npx swarm-tickets
 
 Or the server will automatically find the next available port if 3456 is busy.
 
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `3456` | Server port |
+| `SWARM_TICKETS_STORAGE` | `json` | Storage backend: `json`, `sqlite`, `supabase` |
+| `SWARM_TICKETS_JSON_PATH` | `./tickets.json` | JSON file path |
+| `SWARM_TICKETS_SQLITE_PATH` | `./tickets.db` | SQLite database path |
+| `SUPABASE_URL` | - | Supabase project URL |
+| `SUPABASE_ANON_KEY` | - | Supabase anonymous key |
+| `SUPABASE_SERVICE_ROLE_KEY` | - | Supabase service role key (for auto-setup) |
+
 ## 📖 API Reference
 
-### Get all tickets
-```
-GET /api/tickets
-```
+### Tickets
 
-### Get single ticket
-```
-GET /api/tickets/:id
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tickets` | List all tickets (supports `?status=`, `?priority=`, `?route=`) |
+| POST | `/api/tickets` | Create new ticket |
+| GET | `/api/tickets/:id` | Get single ticket |
+| PATCH | `/api/tickets/:id` | Update ticket |
+| DELETE | `/api/tickets/:id` | Delete ticket |
+| POST | `/api/tickets/:id/close` | Close ticket (with optional reason) |
+| POST | `/api/tickets/:id/reopen` | Reopen ticket |
+| POST | `/api/tickets/:id/analyze` | Auto-analyze and set priority |
+| POST | `/api/tickets/:id/swarm-action` | Add swarm action |
 
-### Create ticket
-```
-POST /api/tickets
-Content-Type: application/json
+### Comments
 
-{
-  "route": "/page/path",
-  "f12Errors": "Browser console errors",
-  "serverErrors": "Server console errors", 
-  "description": "Optional description",
-  "status": "open|in-progress|fixed|closed"
-}
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tickets/:id/comments` | Get ticket comments |
+| POST | `/api/tickets/:id/comments` | Add comment |
+| PATCH | `/api/tickets/:id/comments/:commentId` | Update comment |
+| DELETE | `/api/tickets/:id/comments/:commentId` | Delete comment |
 
-### Update ticket
-```
-PATCH /api/tickets/:id
-Content-Type: application/json
+### Other
 
-{
-  "status": "fixed",
-  "priority": "high",
-  "namespace": "components/UserList",
-  "swarmActions": [...]
-}
-```
-
-### Add swarm action
-```
-POST /api/tickets/:id/swarm-action
-Content-Type: application/json
-
-{
-  "action": "Fixed null reference in UserList component",
-  "result": "Tested and verified working"
-}
-```
-
-### Delete ticket
-```
-DELETE /api/tickets/:id
-```
-
-### Get stats
-```
-GET /api/stats
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/stats` | Get ticket statistics |
+| POST | `/api/bug-report` | Submit bug report (rate limited) |
+| GET | `/api/health` | Health check |
+| GET | `/api/admin/storage` | Get storage info |
+| POST | `/api/admin/api-keys` | Create API key |
+| GET | `/api/admin/api-keys` | List API keys |
+| DELETE | `/api/admin/api-keys/:key` | Revoke API key |
 
 ## 📁 File Structure
 
@@ -172,9 +375,14 @@ your-project/
 │           └── SKILL.md          # Claude skill documentation
 ├── ticket-backups/               # Automatic backups (last 10)
 ├── ticket-tracker.html           # Web UI
-├── tickets.json                  # Your tickets
+├── tickets.json                  # Your tickets (JSON mode)
+├── tickets.db                    # Your tickets (SQLite mode)
 └── node_modules/
     └── swarm-tickets/
+        ├── lib/
+        │   └── storage/          # Storage adapters
+        ├── bug-report-widget.js  # Embeddable widget
+        └── ...
 ```
 
 ## 🔧 Local Development
@@ -198,6 +406,7 @@ Add to your `.gitignore` if you don't want to commit tickets:
 
 ```
 tickets.json
+tickets.db
 ticket-backups/
 ```
 
@@ -213,9 +422,12 @@ Built for the Claude community! Issues and PRs welcome.
 
 - Use the **Quick Prompt** button to generate Claude-ready prompts
 - Set **priorities** to help Claude focus on critical issues first
+- Add **comments** to discuss issues with team and AI
 - Add **swarm actions** to document what was fixed and how
 - Use **namespaces** to track which files/components were modified
 - Link **related tickets** to help Claude understand patterns
+- Use **SQLite** for better performance on larger projects
+- Use **Supabase** for team collaboration and cloud deployments
 
 ## 🐛 Troubleshooting
 
@@ -232,6 +444,17 @@ PORT=4000 npx swarm-tickets
 
 ### Files not showing up
 Make sure you're in your project directory when running `npx swarm-tickets`. The server looks for `tickets.json` in the current directory.
+
+### SQLite not working
+Install the optional dependency:
+```bash
+npm install better-sqlite3
+```
+
+### Supabase not working
+1. Install the optional dependency: `npm install @supabase/supabase-js`
+2. Make sure environment variables are set
+3. Check if tables exist (run migration SQL if needed)
 
 ---
 

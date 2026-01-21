@@ -3,43 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claude-flow Ticket Tracker</title>
+    <title>Swarm Tickets - Ticket Tracker</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #1a1a1a;
             color: #e0e0e0;
             padding: 20px;
         }
-        
+
         .container { max-width: 1200px; margin: 0 auto; }
         h1 { margin-bottom: 10px; color: #00d4aa; }
-        
+
         .project-name {
             color: #999;
             font-size: 0.9em;
             margin-bottom: 30px;
             font-weight: normal;
         }
-        
+
         .server-status {
             padding: 10px 15px;
             border-radius: 5px;
             margin-bottom: 20px;
             font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .server-online { background: #2d4a2d; border-left: 4px solid #6bcf7f; }
         .server-offline { background: #4a2d2d; border-left: 4px solid #ff6b6b; }
-        
+
+        .storage-badge {
+            background: #444;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+
         .tabs {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
             border-bottom: 2px solid #333;
         }
-        
+
         .tab {
             padding: 10px 20px;
             background: #2a2a2a;
@@ -49,22 +60,22 @@
             border-radius: 5px 5px 0 0;
             transition: all 0.3s;
         }
-        
+
         .tab:hover { background: #333; }
         .tab.active { background: #00d4aa; color: #1a1a1a; }
-        
+
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        
+
         .form-group { margin-bottom: 20px; }
-        
+
         label {
             display: block;
             margin-bottom: 5px;
             color: #00d4aa;
             font-weight: 500;
         }
-        
+
         input, textarea, select {
             width: 100%;
             padding: 10px;
@@ -74,13 +85,13 @@
             border-radius: 5px;
             font-family: inherit;
         }
-        
+
         textarea {
             resize: vertical;
             font-family: 'Courier New', monospace;
             min-height: 100px;
         }
-        
+
         button {
             background: #00d4aa;
             color: #1a1a1a;
@@ -91,14 +102,37 @@
             font-weight: 600;
             transition: all 0.3s;
         }
-        
+
         button:hover {
             background: #00ffcc;
             transform: translateY(-2px);
         }
-        
+
+        .btn-secondary {
+            background: #444;
+            color: #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #555;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff8888;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+
         .ticket-list { display: grid; gap: 15px; }
-        
+
         .ticket-card {
             background: #2a2a2a;
             border: 1px solid #444;
@@ -106,58 +140,58 @@
             padding: 20px;
             transition: all 0.3s;
         }
-        
+
         .ticket-card:hover {
             border-color: #00d4aa;
             box-shadow: 0 0 20px rgba(0, 212, 170, 0.1);
         }
-        
+
         .ticket-header {
             display: flex;
             justify-content: space-between;
             align-items: start;
             margin-bottom: 15px;
         }
-        
+
         .ticket-id {
             font-weight: 700;
             color: #00d4aa;
             font-size: 1.1em;
         }
-        
+
         .ticket-meta { display: flex; gap: 10px; flex-wrap: wrap; }
-        
+
         .badge {
             padding: 4px 12px;
             border-radius: 12px;
             font-size: 0.85em;
             font-weight: 600;
         }
-        
+
         .status-open { background: #ff6b6b; color: white; }
         .status-in-progress { background: #ffd93d; color: #1a1a1a; }
         .status-fixed { background: #6bcf7f; color: white; }
         .status-closed { background: #666; color: white; }
-        
+
         .priority-critical { background: #ff3838; color: white; }
         .priority-high { background: #ff9f43; color: white; }
         .priority-medium { background: #ffd93d; color: #1a1a1a; }
         .priority-low { background: #6bcf7f; color: white; }
-        
+
         .ticket-route {
             color: #00d4aa;
             font-family: 'Courier New', monospace;
             margin-bottom: 10px;
         }
-        
+
         .error-section { margin: 10px 0; }
-        
+
         .error-section h4 {
             color: #ff6b6b;
             margin-bottom: 5px;
             font-size: 0.9em;
         }
-        
+
         .error-content {
             background: #1a1a1a;
             padding: 10px;
@@ -167,7 +201,7 @@
             overflow-x: auto;
             white-space: pre-wrap;
         }
-        
+
         .ticket-footer {
             margin-top: 15px;
             padding-top: 15px;
@@ -175,26 +209,33 @@
             font-size: 0.85em;
             color: #999;
         }
-        
+
+        .ticket-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
         .filters {
             display: flex;
             gap: 15px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
-        
+
         .filter-group {
             flex: 1;
             min-width: 200px;
         }
-        
+
         .stats {
             display: flex;
             gap: 15px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
-        
+
         .stat-card {
             flex: 1;
             min-width: 150px;
@@ -203,31 +244,29 @@
             border-radius: 8px;
             border: 1px solid #444;
         }
-        
+
         .stat-value {
             font-size: 2em;
             font-weight: 700;
             color: #00d4aa;
         }
-        
+
         .stat-label {
             color: #999;
             font-size: 0.9em;
         }
-        
+
         .quick-prompt-btn {
             background: #6c5ce7;
             color: white;
             padding: 8px 16px;
             font-size: 0.9em;
-            margin-top: 10px;
-            display: inline-block;
         }
-        
+
         .quick-prompt-btn:hover {
             background: #5f4fd1;
         }
-        
+
         .settings-section {
             background: #2a2a2a;
             padding: 20px;
@@ -235,12 +274,12 @@
             margin-bottom: 20px;
             border: 1px solid #444;
         }
-        
+
         .settings-section h3 {
             color: #00d4aa;
             margin-bottom: 15px;
         }
-        
+
         .template-info {
             background: #1a1a1a;
             padding: 10px;
@@ -249,50 +288,157 @@
             font-size: 0.9em;
             color: #999;
         }
-        
+
         .template-info code {
             color: #00d4aa;
             background: #2a2a2a;
             padding: 2px 6px;
             border-radius: 3px;
         }
+
+        /* Comments section */
+        .comments-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+        }
+
+        .comments-section h4 {
+            color: #00d4aa;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .comment {
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 3px solid #444;
+        }
+
+        .comment.human { border-left-color: #6c5ce7; }
+        .comment.ai { border-left-color: #00d4aa; }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8em;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .comment-type {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            text-transform: uppercase;
+        }
+
+        .comment-type.human { background: #6c5ce7; color: white; }
+        .comment-type.ai { background: #00d4aa; color: #1a1a1a; }
+
+        .comment-content {
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .add-comment {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .add-comment input {
+            flex: 1;
+            padding: 8px 12px;
+        }
+
+        .add-comment button {
+            padding: 8px 16px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.open { display: flex; }
+
+        .modal-content {
+            background: #2a2a2a;
+            padding: 25px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 { color: #00d4aa; }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        .modal-close:hover { color: #fff; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎫 Claude-flow Ticket Tracker</h1>
+        <h1>🎫 Swarm Tickets</h1>
         <div class="project-name" id="project-name">📁 Loading project...</div>
-        
+
         <div id="server-status" class="server-status"></div>
-        
+
         <div class="tabs">
             <button class="tab active" onclick="switchTab('submit')">Submit Ticket</button>
             <button class="tab" onclick="switchTab('view')">View Tickets</button>
             <button class="tab" onclick="switchTab('settings')">Settings</button>
         </div>
-        
+
         <div id="submit-tab" class="tab-content active">
             <form id="ticket-form">
                 <div class="form-group">
                     <label for="route" id="route-form-label">Route/Webpage</label>
                     <input type="text" id="route" required placeholder="/dashboard/users">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="f12-errors" id="f12-form-label">F12 Console Errors</label>
                     <textarea id="f12-errors" placeholder="Paste console errors from browser DevTools..."></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="server-errors" id="server-form-label">Server Console Errors</label>
                     <textarea id="server-errors" placeholder="Paste server-side console errors..."></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="description">Description (Optional)</label>
                     <textarea id="description" rows="3" placeholder="Additional context or steps to reproduce..."></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="status">Status</label>
                     <select id="status">
@@ -302,14 +448,14 @@
                         <option value="closed">Closed</option>
                     </select>
                 </div>
-                
+
                 <button type="submit">Create Ticket</button>
             </form>
         </div>
-        
+
         <div id="view-tab" class="tab-content">
             <div class="stats" id="stats"></div>
-            
+
             <div class="filters">
                 <div class="filter-group">
                     <label for="filter-status">Filter by Status</label>
@@ -321,7 +467,7 @@
                         <option value="closed">Closed</option>
                     </select>
                 </div>
-                
+
                 <div class="filter-group">
                     <label for="filter-priority">Filter by Priority</label>
                     <select id="filter-priority" onchange="filterTickets()">
@@ -332,21 +478,21 @@
                         <option value="low">Low</option>
                     </select>
                 </div>
-                
+
                 <div class="filter-group">
                     <label for="search">Search</label>
                     <input type="text" id="search" placeholder="Search tickets..." oninput="filterTickets()">
                 </div>
             </div>
-            
+
             <div class="ticket-list" id="ticket-list"></div>
         </div>
-        
+
         <div id="settings-tab" class="tab-content">
             <div class="settings-section">
                 <h3>Quick Prompt Template</h3>
                 <p style="margin-bottom: 15px; color: #999;">Customize the prompt that gets copied when you click the Quick Prompt button on a ticket.</p>
-                
+
                 <div class="form-group">
                     <label for="prompt-template">Template</label>
                     <textarea id="prompt-template" rows="5" placeholder="Please investigate and fix ticket {TICKET_ID}."></textarea>
@@ -355,48 +501,70 @@
                         <ul style="margin-top: 5px; margin-left: 20px;">
                             <li><code>{TICKET_ID}</code> - The ticket's unique identifier</li>
                         </ul>
-                        <p style="margin-top: 10px;">💡 Tip: Keep it simple and let Claude-flow ask clarifying questions as needed.</p>
                     </div>
                 </div>
-                
+
                 <button onclick="savePromptTemplate()">Save Template</button>
-                <button onclick="resetPromptTemplate()" style="background: #666; margin-left: 10px;">Reset to Default</button>
+                <button onclick="resetPromptTemplate()" class="btn-secondary" style="margin-left: 10px;">Reset to Default</button>
             </div>
-            
+
             <div class="settings-section">
                 <h3>Project & Field Labels</h3>
                 <p style="margin-bottom: 15px; color: #999;">Customize how fields are displayed in your ticket tracker.</p>
-                
+
                 <div class="form-group">
                     <label for="project-name-input">Project Name</label>
                     <input type="text" id="project-name-input" placeholder="My Awesome Project">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="route-label">Location Field Label</label>
                     <input type="text" id="route-label" placeholder="Route/Webpage">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="f12-label">Client Errors Field Label</label>
                     <input type="text" id="f12-label" placeholder="F12 Console Errors">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="server-label">Server Errors Field Label</label>
                     <input type="text" id="server-label" placeholder="Server Console Errors">
                 </div>
-                
+
                 <button onclick="saveFieldLabels()">Save Labels</button>
-                <button onclick="resetFieldLabels()" style="background: #666; margin-left: 10px;">Reset to Default</button>
+                <button onclick="resetFieldLabels()" class="btn-secondary" style="margin-left: 10px;">Reset to Default</button>
             </div>
         </div>
     </div>
-    
+
+    <!-- Comment Modal -->
+    <div id="comment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💬 Add Comment</h3>
+                <button class="modal-close" onclick="closeCommentModal()">&times;</button>
+            </div>
+            <form id="comment-form">
+                <input type="hidden" id="comment-ticket-id">
+                <div class="form-group">
+                    <label for="comment-author">Your Name</label>
+                    <input type="text" id="comment-author" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label for="comment-content">Comment</label>
+                    <textarea id="comment-content" rows="4" placeholder="Write your comment..." required></textarea>
+                </div>
+                <button type="submit">Add Comment</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         let tickets = [];
         let useServer = false;
-        const API_BASE = 'http://localhost:3456/api';
+        let storageType = 'json';
+        const API_BASE = window.location.origin + '/api';
         const DEFAULT_PROMPT_TEMPLATE = 'Please investigate and fix ticket {TICKET_ID}.';
         const DEFAULT_FIELD_LABELS = {
             projectName: 'Ticket Tracker',
@@ -404,19 +572,19 @@
             f12: 'F12 Console Errors',
             server: 'Server Console Errors'
         };
-        
+
         // Load field labels from localStorage or use defaults
         function getFieldLabels() {
             const stored = localStorage.getItem('claudeflow-field-labels');
             return stored ? JSON.parse(stored) : DEFAULT_FIELD_LABELS;
         }
-        
+
         // Update project name display
         function updateProjectName() {
             const labels = getFieldLabels();
             document.getElementById('project-name').textContent = '📁 ' + labels.projectName;
         }
-        
+
         // Update all form labels
         function updateFormLabels() {
             const labels = getFieldLabels();
@@ -424,12 +592,12 @@
             document.getElementById('f12-form-label').textContent = labels.f12;
             document.getElementById('server-form-label').textContent = labels.server;
         }
-        
+
         // Load prompt template from localStorage or use default
         function getPromptTemplate() {
             return localStorage.getItem('claudeflow-prompt-template') || DEFAULT_PROMPT_TEMPLATE;
         }
-        
+
         // Save prompt template to localStorage
         function savePromptTemplate() {
             const template = document.getElementById('prompt-template').value.trim();
@@ -440,7 +608,7 @@
             localStorage.setItem('claudeflow-prompt-template', template);
             alert('✅ Prompt template saved!');
         }
-        
+
         // Reset prompt template to default
         function resetPromptTemplate() {
             if (confirm('Reset to default template?')) {
@@ -449,7 +617,7 @@
                 alert('✅ Template reset to default!');
             }
         }
-        
+
         // Save field labels to localStorage
         function saveFieldLabels() {
             const labels = {
@@ -463,7 +631,7 @@
             updateFormLabels();
             alert('✅ Field labels saved!');
         }
-        
+
         // Reset field labels to defaults
         function resetFieldLabels() {
             if (confirm('Reset all field labels to defaults?')) {
@@ -477,12 +645,12 @@
                 alert('✅ Labels reset to defaults!');
             }
         }
-        
+
         // Copy quick prompt for a ticket
         function copyQuickPrompt(ticketId) {
             const template = getPromptTemplate();
             const prompt = template.replace(/{TICKET_ID}/g, ticketId);
-            
+
             navigator.clipboard.writeText(prompt).then(() => {
                 alert('✅ Prompt copied to clipboard!\n\n' + prompt);
             }).catch(err => {
@@ -490,12 +658,18 @@
                 alert('❌ Failed to copy to clipboard');
             });
         }
-        
+
         // Check if server is available
         async function checkServer() {
             try {
-                const response = await fetch(`${API_BASE}/tickets`);
-                useServer = response.ok;
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    useServer = true;
+                    storageType = data.storage || 'json';
+                } else {
+                    useServer = false;
+                }
                 updateServerStatus();
                 return useServer;
             } catch {
@@ -504,23 +678,29 @@
                 return false;
             }
         }
-        
+
         // Update server status indicator
         function updateServerStatus() {
             const statusEl = document.getElementById('server-status');
             if (useServer) {
                 statusEl.className = 'server-status server-online';
-                statusEl.textContent = '✅ Server connected - using tickets.json';
+                statusEl.innerHTML = `
+                    <span>✅ Server connected</span>
+                    <span class="storage-badge">${storageType}</span>
+                `;
             } else {
                 statusEl.className = 'server-status server-offline';
-                statusEl.textContent = '⚠️ Server offline - using localStorage';
+                statusEl.innerHTML = `
+                    <span>⚠️ Server offline - using localStorage</span>
+                    <span class="storage-badge">local</span>
+                `;
             }
         }
-        
+
         // Load tickets from server or localStorage
         async function loadTickets() {
             await checkServer();
-            
+
             if (useServer) {
                 try {
                     const response = await fetch(`${API_BASE}/tickets`);
@@ -534,7 +714,7 @@
                 loadFromLocalStorage();
             }
         }
-        
+
         // Load from localStorage
         function loadFromLocalStorage() {
             const stored = localStorage.getItem('claudeflow-tickets');
@@ -543,7 +723,7 @@
                 console.log('✅ Loaded', tickets.length, 'tickets from localStorage');
             }
         }
-        
+
         // Save ticket to server or localStorage
         async function saveTicket(ticket) {
             if (useServer) {
@@ -561,21 +741,110 @@
                     return ticket;
                 }
             } else {
+                ticket.id = 'TKT-' + Date.now();
+                ticket.createdAt = new Date().toISOString();
+                ticket.updatedAt = new Date().toISOString();
+                ticket.swarmActions = [];
+                ticket.comments = [];
+                ticket.relatedTickets = [];
                 tickets.push(ticket);
                 localStorage.setItem('claudeflow-tickets', JSON.stringify(tickets));
                 console.log('✅ Ticket saved to localStorage');
                 return ticket;
             }
         }
-        
+
+        // Close ticket
+        async function closeTicket(ticketId) {
+            if (!confirm('Close this ticket?')) return;
+
+            if (useServer) {
+                try {
+                    await fetch(`${API_BASE}/tickets/${ticketId}/close`, { method: 'POST' });
+                    await loadTickets();
+                    renderTickets();
+                    renderStats();
+                } catch (error) {
+                    alert('Failed to close ticket');
+                }
+            }
+        }
+
+        // Reopen ticket
+        async function reopenTicket(ticketId) {
+            if (!confirm('Reopen this ticket?')) return;
+
+            if (useServer) {
+                try {
+                    await fetch(`${API_BASE}/tickets/${ticketId}/reopen`, { method: 'POST' });
+                    await loadTickets();
+                    renderTickets();
+                    renderStats();
+                } catch (error) {
+                    alert('Failed to reopen ticket');
+                }
+            }
+        }
+
+        // Open comment modal
+        function openCommentModal(ticketId) {
+            document.getElementById('comment-ticket-id').value = ticketId;
+            document.getElementById('comment-content').value = '';
+            document.getElementById('comment-modal').classList.add('open');
+        }
+
+        // Close comment modal
+        function closeCommentModal() {
+            document.getElementById('comment-modal').classList.remove('open');
+        }
+
+        // Add comment
+        async function addComment(ticketId, author, content) {
+            if (useServer) {
+                try {
+                    await fetch(`${API_BASE}/tickets/${ticketId}/comments`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'human', author, content })
+                    });
+                    await loadTickets();
+                    renderTickets();
+                } catch (error) {
+                    alert('Failed to add comment');
+                }
+            }
+        }
+
+        // Handle comment form
+        document.getElementById('comment-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const ticketId = document.getElementById('comment-ticket-id').value;
+            const author = document.getElementById('comment-author').value;
+            const content = document.getElementById('comment-content').value;
+
+            // Save author name for next time
+            localStorage.setItem('claudeflow-author', author);
+
+            await addComment(ticketId, author, content);
+            closeCommentModal();
+        });
+
+        // Load saved author name
+        function loadSavedAuthor() {
+            const saved = localStorage.getItem('claudeflow-author');
+            if (saved) {
+                document.getElementById('comment-author').value = saved;
+            }
+        }
+
         // Switch between tabs
         async function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
+
             event.target.classList.add('active');
             document.getElementById(`${tabName}-tab`).classList.add('active');
-            
+
             if (tabName === 'view') {
                 await loadTickets();
                 renderTickets();
@@ -590,11 +859,11 @@
                 document.getElementById('server-label').value = labels.server;
             }
         }
-        
+
         // Handle form submission
         document.getElementById('ticket-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             const ticket = {
                 route: document.getElementById('route').value,
                 f12Errors: document.getElementById('f12-errors').value,
@@ -602,15 +871,15 @@
                 description: document.getElementById('description').value,
                 status: document.getElementById('status').value
             };
-            
+
             const savedTicket = await saveTicket(ticket);
-            
+
             // Clear form
             this.reset();
-            
+
             alert('Ticket created: ' + savedTicket.id);
         });
-        
+
         // Render statistics
         function renderStats() {
             const stats = {
@@ -619,7 +888,7 @@
                 inProgress: tickets.filter(t => t.status === 'in-progress').length,
                 fixed: tickets.filter(t => t.status === 'fixed').length
             };
-            
+
             const statsHTML = `
                 <div class="stat-card">
                     <div class="stat-value">${stats.total}</div>
@@ -638,26 +907,26 @@
                     <div class="stat-label">Fixed</div>
                 </div>
             `;
-            
+
             document.getElementById('stats').innerHTML = statsHTML;
         }
-        
+
         // Render tickets
         function renderTickets(filteredTickets = null) {
             const ticketsToRender = filteredTickets || tickets;
             const container = document.getElementById('ticket-list');
             const labels = getFieldLabels();
-            
+
             if (ticketsToRender.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #999;">No tickets found.</p>';
                 return;
             }
-            
+
             // Sort by most recent first
-            const sorted = [...ticketsToRender].sort((a, b) => 
+            const sorted = [...ticketsToRender].sort((a, b) =>
                 new Date(b.createdAt) - new Date(a.createdAt)
             );
-            
+
             container.innerHTML = sorted.map(ticket => `
                 <div class="ticket-card">
                     <div class="ticket-header">
@@ -667,74 +936,117 @@
                             ${ticket.priority ? `<span class="badge priority-${ticket.priority}">${ticket.priority.toUpperCase()}</span>` : ''}
                         </div>
                     </div>
-                    
+
                     <div class="ticket-route">📍 ${ticket.route}</div>
-                    
-                    ${ticket.description ? `<p style="margin-bottom: 10px;">${ticket.description}</p>` : ''}
-                    
+
+                    ${ticket.description ? `<p style="margin-bottom: 10px;">${escapeHtml(ticket.description)}</p>` : ''}
+
                     ${ticket.f12Errors ? `
                         <div class="error-section">
                             <h4>🔴 ${labels.f12}</h4>
-                            <div class="error-content">${ticket.f12Errors}</div>
+                            <div class="error-content">${escapeHtml(ticket.f12Errors)}</div>
                         </div>
                     ` : ''}
-                    
+
                     ${ticket.serverErrors ? `
                         <div class="error-section">
                             <h4>🖥️ ${labels.server}</h4>
-                            <div class="error-content">${ticket.serverErrors}</div>
+                            <div class="error-content">${escapeHtml(ticket.serverErrors)}</div>
                         </div>
                     ` : ''}
-                    
+
                     ${ticket.swarmActions && ticket.swarmActions.length > 0 ? `
                         <div class="error-section">
                             <h4>🤖 Swarm Actions</h4>
-                            <div class="error-content">${ticket.swarmActions.map(a => typeof a === 'string' ? a : JSON.stringify(a, null, 2)).join('\n\n')}</div>
+                            <div class="error-content">${ticket.swarmActions.map(a =>
+                                typeof a === 'string' ? escapeHtml(a) :
+                                `[${a.timestamp}] ${escapeHtml(a.action)}${a.result ? ' → ' + escapeHtml(a.result) : ''}`
+                            ).join('\n')}</div>
                         </div>
                     ` : ''}
-                    
+
+                    ${ticket.comments && ticket.comments.length > 0 ? `
+                        <div class="comments-section">
+                            <h4>💬 Comments (${ticket.comments.length})</h4>
+                            ${ticket.comments.map(c => `
+                                <div class="comment ${c.type}">
+                                    <div class="comment-header">
+                                        <span>
+                                            <span class="comment-author">${escapeHtml(c.author)}</span>
+                                            <span class="comment-type ${c.type}">${c.type}</span>
+                                        </span>
+                                        <span>${new Date(c.timestamp).toLocaleString()}</span>
+                                    </div>
+                                    <div class="comment-content">${escapeHtml(c.content)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
                     ${ticket.namespace ? `
                         <div style="margin-top: 10px;">
-                            <strong>Namespace:</strong> <code>${ticket.namespace}</code>
+                            <strong>Namespace:</strong> <code>${escapeHtml(ticket.namespace)}</code>
                         </div>
                     ` : ''}
-                    
+
                     <div class="ticket-footer">
                         <div>Created: ${new Date(ticket.createdAt).toLocaleString()}</div>
                         <div>Updated: ${new Date(ticket.updatedAt).toLocaleString()}</div>
                         ${ticket.relatedTickets && ticket.relatedTickets.length > 0 ? `
                             <div style="margin-top: 10px;">
-                                <strong>Related:</strong> 
+                                <strong>Related:</strong>
                                 ${ticket.relatedTickets.map(id => `<span style="color: #00d4aa; margin-right: 10px;">${id}</span>`).join('')}
                             </div>
                         ` : ''}
                     </div>
-                    
-                    <button class="quick-prompt-btn" onclick="copyQuickPrompt('${ticket.id}')">
-                        📋 Quick Prompt
-                    </button>
+
+                    <div class="ticket-actions">
+                        <button class="quick-prompt-btn btn-small" onclick="copyQuickPrompt('${ticket.id}')">
+                            📋 Quick Prompt
+                        </button>
+                        <button class="btn-secondary btn-small" onclick="openCommentModal('${ticket.id}')">
+                            💬 Add Comment
+                        </button>
+                        ${ticket.status !== 'closed' ? `
+                            <button class="btn-danger btn-small" onclick="closeTicket('${ticket.id}')">
+                                ✖️ Close
+                            </button>
+                        ` : `
+                            <button class="btn-secondary btn-small" onclick="reopenTicket('${ticket.id}')">
+                                🔄 Reopen
+                            </button>
+                        `}
+                    </div>
                 </div>
             `).join('');
         }
-        
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         // Filter tickets
         function filterTickets() {
             const statusFilter = document.getElementById('filter-status').value;
             const priorityFilter = document.getElementById('filter-priority').value;
             const searchTerm = document.getElementById('search').value.toLowerCase();
-            
+
             let filtered = tickets;
-            
+
             if (statusFilter) {
                 filtered = filtered.filter(t => t.status === statusFilter);
             }
-            
+
             if (priorityFilter) {
                 filtered = filtered.filter(t => t.priority === priorityFilter);
             }
-            
+
             if (searchTerm) {
-                filtered = filtered.filter(t => 
+                filtered = filtered.filter(t =>
                     t.id.toLowerCase().includes(searchTerm) ||
                     t.route.toLowerCase().includes(searchTerm) ||
                     (t.description && t.description.toLowerCase().includes(searchTerm)) ||
@@ -742,13 +1054,28 @@
                     (t.serverErrors && t.serverErrors.toLowerCase().includes(searchTerm))
                 );
             }
-            
+
             renderTickets(filtered);
         }
-        
+
+        // Close modal on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCommentModal();
+            }
+        });
+
+        // Close modal on overlay click
+        document.getElementById('comment-modal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                closeCommentModal();
+            }
+        });
+
         // Initialize
         updateProjectName();
         updateFormLabels();
+        loadSavedAuthor();
         loadTickets();
     </script>
 </body>

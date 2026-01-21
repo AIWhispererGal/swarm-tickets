@@ -24,16 +24,15 @@ try {
     console.log('✅ Installed swarm skill');
   }
   
-  // Copy ticket-tracker.html to project root
+  // Copy ticket-tracker.html to project root (always update to get latest features)
   const htmlSource = path.join(__dirname, 'ticket-tracker.html');
   const htmlDest = path.join(projectRoot, 'ticket-tracker.html');
-  
-  if (!fs.existsSync(htmlDest)) {
-    fs.copyFileSync(htmlSource, htmlDest);
-    console.log('✅ Copied ticket-tracker.html to project root');
-  } else {
-    console.log('⚠️  ticket-tracker.html already exists, skipping');
-  }
+
+  const htmlExists = fs.existsSync(htmlDest);
+  fs.copyFileSync(htmlSource, htmlDest);
+  console.log(htmlExists
+    ? '✅ Updated ticket-tracker.html to latest version'
+    : '✅ Copied ticket-tracker.html to project root');
   
   // Create tickets.json if it doesn't exist
   const ticketsFile = path.join(projectRoot, 'tickets.json');

@@ -78,6 +78,8 @@ npx swarm-tickets
 ### SQLite (Local SQL)
 For better performance and query capabilities with a local database.
 
+> **Note:** `better-sqlite3` is an optional dependency because it requires native compilation. Only install if you want SQLite storage.
+
 ```bash
 # Install optional dependency
 npm install better-sqlite3
@@ -107,12 +109,23 @@ export SUPABASE_SERVICE_ROLE_KEY=your-service-key
 npx swarm-tickets
 ```
 
+#### Finding Your Supabase Credentials
+
+1. Go to [supabase.com](https://supabase.com) and create a project (or open existing)
+2. Navigate to **Project Settings** > **API**
+3. Copy these values:
+   - **Project URL** → use as `SUPABASE_URL`
+   - **anon public** key → use as `SUPABASE_ANON_KEY`
+   - **service_role** key → use as `SUPABASE_SERVICE_ROLE_KEY` (keep secret!)
+
 #### Supabase Manual Setup
 
 If you prefer to create tables manually (recommended for production):
 
+> To run the SQL: Go to your Supabase Dashboard > **SQL Editor** > **New query**, paste the SQL below, and click **Run**.
+
 ```sql
--- Run this in your Supabase SQL Editor
+-- Supabase SQL Schema for swarm-tickets
 
 -- Main tickets table
 CREATE TABLE IF NOT EXISTS tickets (
@@ -235,13 +248,21 @@ curl -X POST http://localhost:3456/api/tickets/TKT-123/comments \
 
 ## 🐛 Bug Report Widget
 
-Let end-users report bugs directly from your application:
+Let end-users report bugs directly from your application. The widget JavaScript is served automatically by the swarm-tickets server.
 
 ### Embed the Widget
 
 ```html
-<script src="https://your-server:3456/bug-report-widget.js"
-        data-endpoint="https://your-server:3456/api/bug-report"
+<!-- For local development -->
+<script src="http://localhost:3456/bug-report-widget.js"
+        data-endpoint="http://localhost:3456/api/bug-report"
+        data-position="bottom-right"
+        data-theme="dark">
+</script>
+
+<!-- For production (use your actual server URL) -->
+<script src="https://your-server.com/bug-report-widget.js"
+        data-endpoint="https://your-server.com/api/bug-report"
         data-api-key="stk_your_api_key"
         data-position="bottom-right"
         data-theme="dark">
@@ -275,6 +296,8 @@ SwarmBugReport.init({
 | `maxErrors` | `10` | Max errors to collect |
 
 ### Generate API Keys (SQLite/Supabase only)
+
+> **Note:** API key management requires SQLite or Supabase storage. JSON storage mode does not persist API keys between server restarts.
 
 ```bash
 # Create an API key

@@ -371,16 +371,35 @@ The UI allows users to:
 
 ## Bug Report Widget
 
-For end-user bug reporting, embed the widget in your application:
+For end-user bug reporting, embed the widget in your application. The widget is served automatically by the swarm-tickets server.
 
 ```html
-<script src="https://your-server/bug-report-widget.js"
-        data-endpoint="https://your-server/api/bug-report"
+<!-- Local development -->
+<script src="http://localhost:3456/bug-report-widget.js"
+        data-endpoint="http://localhost:3456/api/bug-report"
+        data-position="bottom-right"
+        data-theme="dark">
+</script>
+
+<!-- Production (use your actual server URL) -->
+<script src="https://your-server.com/bug-report-widget.js"
+        data-endpoint="https://your-server.com/api/bug-report"
         data-api-key="stk_your_api_key"
         data-position="bottom-right"
         data-theme="dark">
 </script>
 ```
+
+### Widget Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `data-endpoint` | `/api/bug-report` | API endpoint URL |
+| `data-api-key` | none | API key for authentication |
+| `data-position` | `bottom-right` | `bottom-right`, `bottom-left`, `top-right`, `top-left` |
+| `data-theme` | `dark` | `dark` or `light` |
+
+See the main README.md for complete widget configuration and API key management.
 
 ## Notes
 

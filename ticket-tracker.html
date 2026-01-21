@@ -560,6 +560,47 @@
         </div>
     </div>
 
+    <!-- Edit Ticket Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>✏️ Edit Ticket</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-ticket-id">
+                <div class="form-group">
+                    <label for="edit-status">Status</label>
+                    <select id="edit-status">
+                        <option value="open">Open</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="fixed">Fixed</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-priority">Priority</label>
+                    <select id="edit-priority">
+                        <option value="">Not Set</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-description">Description</label>
+                    <textarea id="edit-description" rows="3" placeholder="Description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-namespace">Namespace (where fix applied)</label>
+                    <input type="text" id="edit-namespace" placeholder="e.g., auth/login, database/connection">
+                </div>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         let tickets = [];
         let useServer = false;
@@ -798,6 +839,63 @@
             document.getElementById('comment-modal').classList.remove('open');
         }
 
+        // Open edit modal
+        function openEditModal(ticketId) {
+            const ticket = tickets.find(t => t.id === ticketId);
+            if (!ticket) return;
+
+            document.getElementById('edit-ticket-id').value = ticketId;
+            document.getElementById('edit-status').value = ticket.status || 'open';
+            document.getElementById('edit-priority').value = ticket.priority || '';
+            document.getElementById('edit-description').value = ticket.description || '';
+            document.getElementById('edit-namespace').value = ticket.namespace || '';
+            document.getElementById('edit-modal').classList.add('open');
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('open');
+        }
+
+        // Handle edit form
+        document.getElementById('edit-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const ticketId = document.getElementById('edit-ticket-id').value;
+            const updates = {
+                status: document.getElementById('edit-status').value,
+                priority: document.getElementById('edit-priority').value || null,
+                description: document.getElementById('edit-description').value,
+                namespace: document.getElementById('edit-namespace').value || null
+            };
+
+            if (useServer) {
+                try {
+                    await fetch(`${API_BASE}/tickets/${ticketId}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updates)
+                    });
+                    await loadTickets();
+                    renderTickets();
+                    renderStats();
+                    closeEditModal();
+                } catch (error) {
+                    alert('Failed to update ticket');
+                }
+            } else {
+                // Update in localStorage
+                const ticket = tickets.find(t => t.id === ticketId);
+                if (ticket) {
+                    Object.assign(ticket, updates);
+                    ticket.updatedAt = new Date().toISOString();
+                    localStorage.setItem('claudeflow-tickets', JSON.stringify(tickets));
+                    renderTickets();
+                    renderStats();
+                    closeEditModal();
+                }
+            }
+        });
+
         // Add comment
         async function addComment(ticketId, author, content) {
             if (useServer) {
@@ -1004,8 +1102,11 @@
                         <button class="quick-prompt-btn btn-small" onclick="copyQuickPrompt('${ticket.id}')">
                             📋 Quick Prompt
                         </button>
+                        <button class="btn-small" onclick="openEditModal('${ticket.id}')" style="background: #3498db;">
+                            ✏️ Edit
+                        </button>
                         <button class="btn-secondary btn-small" onclick="openCommentModal('${ticket.id}')">
-                            💬 Add Comment
+                            💬 Comment
                         </button>
                         ${ticket.status !== 'closed' ? `
                             <button class="btn-danger btn-small" onclick="closeTicket('${ticket.id}')">
@@ -1058,17 +1159,24 @@
             renderTickets(filtered);
         }
 
-        // Close modal on escape
+        // Close modals on escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                closeCommentModal();
+                closeEditModal();
+            }
+        });
+
+        // Close modals on overlay click
+        document.getElementById('comment-modal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
                 closeCommentModal();
             }
         });
 
-        // Close modal on overlay click
-        document.getElementById('comment-modal').addEventListener('click', (e) => {
+        document.getElementById('edit-modal').addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
-                closeCommentModal();
+                closeEditModal();
             }
         });
 

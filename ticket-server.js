@@ -47,13 +47,19 @@ async function findAvailablePort(startPort) {
 
 // ==================== TICKET ENDPOINTS ====================
 
-// GET all tickets
+// GET all tickets (excludes closed by default for performance)
 app.get('/api/tickets', async (req, res) => {
   try {
     const filters = {};
     if (req.query.status) filters.status = req.query.status;
     if (req.query.priority) filters.priority = req.query.priority;
     if (req.query.route) filters.route = req.query.route;
+
+    // Exclude closed tickets by default (use ?include_closed=true to include them)
+    const includeClosed = req.query.include_closed === 'true';
+    if (!includeClosed && !filters.status) {
+      filters.excludeStatus = 'closed';
+    }
 
     const tickets = await storage.getAllTickets(filters);
     res.json(tickets);

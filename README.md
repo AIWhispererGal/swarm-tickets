@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS tickets (
   f12_errors TEXT DEFAULT '',
   server_errors TEXT DEFAULT '',
   description TEXT DEFAULT '',
-  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in-progress', 'fixed', 'closed')),
+  status TEXT NOT NULL DEFAULT 'open',
   priority TEXT CHECK (priority IS NULL OR priority IN ('critical', 'high', 'medium', 'low')),
   namespace TEXT,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),

@@ -9,34 +9,61 @@ This skill enables you to track and manage bug tickets in the project.
 
 ## Overview
 
-The project uses `swarm-tickets` for bug tracking. Tickets are stored in `./tickets.json` at the project root.
+The project uses `swarm-tickets` for bug tracking. Tickets can be stored in multiple backends:
+- **JSON** (default): `./tickets.json` at the project root
+- **SQLite**: `./tickets.db` local database
+- **Supabase**: Cloud PostgreSQL database
+
+## Storage Configuration
+
+Set the storage backend via environment variable:
+
+```bash
+# JSON (default)
+export SWARM_TICKETS_STORAGE=json
+
+# SQLite
+export SWARM_TICKETS_STORAGE=sqlite
+export SWARM_TICKETS_SQLITE_PATH=./tickets.db
+
+# Supabase
+export SWARM_TICKETS_STORAGE=supabase
+export SUPABASE_URL=https://your-project.supabase.co
+export SUPABASE_ANON_KEY=your-anon-key
+```
 
 ## Ticket Structure
 
 ```json
 {
-  "tickets": [
+  "id": "TKT-1234567890",
+  "route": "/dashboard/users",
+  "f12Errors": "Browser console errors",
+  "serverErrors": "Server-side errors",
+  "description": "Additional context",
+  "status": "open|in-progress|fixed|closed",
+  "priority": "critical|high|medium|low",
+  "relatedTickets": ["TKT-xxx"],
+  "swarmActions": [
     {
-      "id": "TKT-1234567890",
-      "route": "/dashboard/users",
-      "f12Errors": "Browser console errors",
-      "serverErrors": "Server-side errors",
-      "description": "Additional context",
-      "status": "open|in-progress|fixed|closed",
-      "priority": "critical|high|medium|low",
-      "relatedTickets": ["TKT-xxx"],
-      "swarmActions": [
-        {
-          "timestamp": "ISO timestamp",
-          "action": "What you did",
-          "result": "What happened"
-        }
-      ],
-      "namespace": "where/fixes/applied",
-      "createdAt": "ISO timestamp",
-      "updatedAt": "ISO timestamp"
+      "timestamp": "ISO timestamp",
+      "action": "What you did",
+      "result": "What happened"
     }
-  ]
+  ],
+  "comments": [
+    {
+      "id": "CMT-xxx",
+      "timestamp": "ISO timestamp",
+      "type": "human|ai",
+      "author": "username",
+      "content": "Comment text",
+      "metadata": {}
+    }
+  ],
+  "namespace": "where/fixes/applied",
+  "createdAt": "ISO timestamp",
+  "updatedAt": "ISO timestamp"
 }
 ```
 
@@ -44,14 +71,121 @@ The project uses `swarm-tickets` for bug tracking. Tickets are stored in `./tick
 
 ### Before You Start
 
-Always create a backup before modifying tickets.json:
+Always create a backup before modifying tickets directly:
 
 ```javascript
 const fs = require('fs').promises;
 await fs.copyFile('tickets.json', `tickets.backup.${Date.now()}.json`);
 ```
 
-### Reading Tickets
+### Using the API (Recommended)
+
+```javascript
+// Base URL for local server
+const API = 'http://localhost:3456/api';
+
+// Get all tickets
+const response = await fetch(`${API}/tickets`);
+const tickets = await response.json();
+
+// Filter tickets
+const openTickets = await fetch(`${API}/tickets?status=open`);
+const criticalTickets = await fetch(`${API}/tickets?priority=critical`);
+
+// Get single ticket
+const ticket = await fetch(`${API}/tickets/TKT-123`).then(r => r.json());
+
+// Create ticket
+const newTicket = await fetch(`${API}/tickets`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    route: '/dashboard',
+    description: 'Something is broken',
+    f12Errors: 'TypeError: ...',
+    serverErrors: ''
+  })
+}).then(r => r.json());
+
+// Update ticket
+await fetch(`${API}/tickets/${ticketId}`, {
+  method: 'PATCH',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    status: 'in-progress',
+    priority: 'high'
+  })
+});
+
+// Close ticket
+await fetch(`${API}/tickets/${ticketId}/close`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ reason: 'Fixed in commit abc123' })
+});
+
+// Reopen ticket
+await fetch(`${API}/tickets/${ticketId}/reopen`, { method: 'POST' });
+
+// Add swarm action
+await fetch(`${API}/tickets/${ticketId}/swarm-action`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    action: 'Investigating database connection',
+    result: 'Found connection pool misconfiguration'
+  })
+});
+```
+
+### Working with Comments
+
+```javascript
+// Add a human comment
+await fetch(`${API}/tickets/${ticketId}/comments`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    type: 'human',
+    author: 'developer-name',
+    content: 'I think this is related to the auth refactor'
+  })
+});
+
+// Add an AI comment
+await fetch(`${API}/tickets/${ticketId}/comments`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    type: 'ai',
+    author: 'claude',
+    content: 'After analyzing the stack trace, this appears to be a null reference issue in UserList.jsx:45',
+    metadata: {
+      analysisType: 'stack-trace',
+      confidence: 'high'
+    }
+  })
+});
+
+// Get all comments for a ticket
+const comments = await fetch(`${API}/tickets/${ticketId}/comments`).then(r => r.json());
+
+// Update a comment
+await fetch(`${API}/tickets/${ticketId}/comments/${commentId}`, {
+  method: 'PATCH',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    content: 'Updated comment text'
+  })
+});
+
+// Delete a comment
+await fetch(`${API}/tickets/${ticketId}/comments/${commentId}`, {
+  method: 'DELETE'
+});
+```
+
+### Reading Tickets (Direct File Access - JSON only)
 
 ```javascript
 const fs = require('fs').promises;
@@ -68,7 +202,7 @@ const highPriority = tickets.filter(t => t.priority === 'high' || t.priority ===
 const routeTickets = tickets.filter(t => t.route.includes('/dashboard'));
 ```
 
-### Updating Tickets
+### Updating Tickets (Direct File Access - JSON only)
 
 When working on a ticket:
 
@@ -129,21 +263,6 @@ if (!ticket.priority) {
 }
 ```
 
-### Linking Related Tickets
-
-Find and link related tickets:
-
-```javascript
-// Find tickets on the same route
-const related = tickets
-  .filter(t => t.id !== ticket.id && t.route === ticket.route)
-  .map(t => t.id);
-
-if (related.length > 0) {
-  ticket.relatedTickets = related;
-}
-```
-
 ### Setting Namespace
 
 Document where fixes were applied:
@@ -161,10 +280,11 @@ ticket.namespace = 'api/users';
 1. **Always backup before modifying** - Copy tickets.json before changes
 2. **Update timestamps** - Set `updatedAt` when changing tickets
 3. **Log your actions** - Add entries to `swarmActions` for everything you do
-4. **Set priorities** - Help triage by assigning priority levels
-5. **Link related tickets** - Connect tickets that affect the same area
-6. **Document namespaces** - Record where fixes were applied
-7. **Be specific** - In swarm actions, explain what you did and why
+4. **Add comments** - Use the comments system for discussion and notes
+5. **Set priorities** - Help triage by assigning priority levels
+6. **Link related tickets** - Connect tickets that affect the same area
+7. **Document namespaces** - Record where fixes were applied
+8. **Be specific** - In swarm actions, explain what you did and why
 
 ## Workflow Example
 
@@ -214,6 +334,27 @@ ticket.updatedAt = new Date().toISOString();
 await fs.writeFile('tickets.json', JSON.stringify(data, null, 2));
 ```
 
+## API Endpoints Reference
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tickets` | List all tickets (supports `?status=`, `?priority=`, `?route=`) |
+| POST | `/api/tickets` | Create new ticket |
+| GET | `/api/tickets/:id` | Get single ticket |
+| PATCH | `/api/tickets/:id` | Update ticket |
+| DELETE | `/api/tickets/:id` | Delete ticket |
+| POST | `/api/tickets/:id/close` | Close ticket (with optional reason) |
+| POST | `/api/tickets/:id/reopen` | Reopen ticket |
+| POST | `/api/tickets/:id/analyze` | Auto-analyze and set priority |
+| POST | `/api/tickets/:id/swarm-action` | Add swarm action |
+| GET | `/api/tickets/:id/comments` | Get ticket comments |
+| POST | `/api/tickets/:id/comments` | Add comment |
+| PATCH | `/api/tickets/:id/comments/:commentId` | Update comment |
+| DELETE | `/api/tickets/:id/comments/:commentId` | Delete comment |
+| GET | `/api/stats` | Get ticket statistics |
+| POST | `/api/bug-report` | Submit bug report (rate limited) |
+| GET | `/api/health` | Health check |
+
 ## UI Access
 
 Users can view and create tickets via the web UI:
@@ -225,11 +366,46 @@ The UI allows users to:
 - Create new tickets with F12 and server errors
 - View all tickets with filtering and search
 - See ticket status, priority, and swarm actions
+- Add comments to tickets
+- Close/reopen tickets
+
+## Bug Report Widget
+
+For end-user bug reporting, embed the widget in your application. The widget is served automatically by the swarm-tickets server.
+
+```html
+<!-- Local development -->
+<script src="http://localhost:3456/bug-report-widget.js"
+        data-endpoint="http://localhost:3456/api/bug-report"
+        data-position="bottom-right"
+        data-theme="dark">
+</script>
+
+<!-- Production (use your actual server URL) -->
+<script src="https://your-server.com/bug-report-widget.js"
+        data-endpoint="https://your-server.com/api/bug-report"
+        data-api-key="stk_your_api_key"
+        data-position="bottom-right"
+        data-theme="dark">
+</script>
+```
+
+### Widget Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `data-endpoint` | `/api/bug-report` | API endpoint URL |
+| `data-api-key` | none | API key for authentication |
+| `data-position` | `bottom-right` | `bottom-right`, `bottom-left`, `top-right`, `top-left` |
+| `data-theme` | `dark` | `dark` or `light` |
+
+See the main README.md for complete widget configuration and API key management.
 
 ## Notes
 
-- Tickets persist in `tickets.json` at project root
-- The server auto-backs up to `ticket-backups/` before writes (if running)
+- Tickets persist based on configured storage (JSON, SQLite, or Supabase)
+- The server auto-backs up to `ticket-backups/` before writes (JSON mode)
 - Manual backups recommended: Copy tickets.json before major changes
 - Recovery: Restore from `ticket-backups/` folder (keeps last 10)
-- The UI and the swarm both work with the same `tickets.json` file
+- The UI and the swarm both work with the same ticket storage
+- Comments support both human and AI authors for collaborative debugging

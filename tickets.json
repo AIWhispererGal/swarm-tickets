@@ -45,7 +45,8 @@
       ],
       "namespace": "routes/committees",
       "createdAt": "2025-11-03T03:57:58.373Z",
-      "updatedAt": "2025-11-03T17:18:00.000Z"
+      "updatedAt": "2025-11-03T17:18:00.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762142359771",
@@ -74,7 +75,8 @@
       ],
       "namespace": "views/pages",
       "createdAt": "2025-11-03T03:59:19.771Z",
-      "updatedAt": "2025-11-03T18:35:00.000Z"
+      "updatedAt": "2025-11-03T18:35:00.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762146463840",
@@ -101,7 +103,8 @@
       ],
       "namespace": "routes/minutes",
       "createdAt": "2025-11-03T05:07:43.840Z",
-      "updatedAt": "2025-11-03T06:15:00.000Z"
+      "updatedAt": "2025-11-03T06:15:00.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762146570709",
@@ -130,7 +133,8 @@
       ],
       "namespace": "routes/council-files",
       "createdAt": "2025-11-03T05:09:30.709Z",
-      "updatedAt": "2025-11-03T18:35:00.000Z"
+      "updatedAt": "2025-11-03T18:35:00.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762146598976",
@@ -159,7 +163,8 @@
       ],
       "namespace": "routes/about",
       "createdAt": "2025-11-03T05:09:58.976Z",
-      "updatedAt": "2025-11-03T18:35:00.000Z"
+      "updatedAt": "2025-11-03T18:35:00.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762146735309",
@@ -190,7 +195,8 @@
       ],
       "namespace": "security/csp",
       "createdAt": "2025-11-03T05:12:15.309Z",
-      "updatedAt": "2025-11-04T00:28:54.104Z"
+      "updatedAt": "2025-11-04T00:28:54.104Z",
+      "comments": []
     },
     {
       "id": "TKT-1762146797458",
@@ -219,7 +225,8 @@
       ],
       "namespace": "routes/dashboard/upload",
       "createdAt": "2025-11-03T05:13:17.458Z",
-      "updatedAt": "2025-11-03T06:15:00.000Z"
+      "updatedAt": "2025-11-03T06:15:00.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762146912527",
@@ -249,7 +256,8 @@
       ],
       "namespace": "middleware/auditLog",
       "createdAt": "2025-11-03T05:15:12.527Z",
-      "updatedAt": "2025-11-03T06:15:00.000Z"
+      "updatedAt": "2025-11-03T06:15:00.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762149614118",
@@ -278,7 +286,8 @@
       ],
       "namespace": "middleware/auditLog",
       "createdAt": "2025-11-03T06:00:14.118Z",
-      "updatedAt": "2025-11-03T06:30:00.000Z"
+      "updatedAt": "2025-11-03T06:30:00.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762149764221",
@@ -307,7 +316,8 @@
       ],
       "namespace": "routes/dashboard/upload",
       "createdAt": "2025-11-03T06:02:44.221Z",
-      "updatedAt": "2025-11-03T06:30:00.000Z"
+      "updatedAt": "2025-11-03T06:30:00.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762188144934",
@@ -330,7 +340,8 @@
       ],
       "namespace": "security/csp",
       "createdAt": "2025-11-03T16:42:24.934Z",
-      "updatedAt": "2025-11-03T17:14:45.086Z"
+      "updatedAt": "2025-11-03T17:14:45.086Z",
+      "comments": []
     },
     {
       "id": "TKT-1762188267474",
@@ -363,7 +374,8 @@
       ],
       "namespace": "frontend/dashboard",
       "createdAt": "2025-11-03T16:44:27.474Z",
-      "updatedAt": "2025-11-03T18:35:00.000Z"
+      "updatedAt": "2025-11-03T18:35:00.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762188415024",
@@ -384,7 +396,8 @@
       ],
       "namespace": "features/parsing",
       "createdAt": "2025-11-03T16:46:55.024Z",
-      "updatedAt": "2025-11-03T17:14:45.086Z"
+      "updatedAt": "2025-11-03T17:14:45.086Z",
+      "comments": []
     },
     {
       "id": "TKT-1762188528841",
@@ -432,7 +445,8 @@
       ],
       "namespace": "database/schema",
       "createdAt": "2025-11-03T16:48:48.841Z",
-      "updatedAt": "2025-11-04T00:28:54.104Z"
+      "updatedAt": "2025-11-04T00:28:54.104Z",
+      "comments": []
     },
     {
       "id": "TKT-1762196408830",
@@ -453,7 +467,8 @@
       ],
       "namespace": "config/supabase-client",
       "createdAt": "2025-11-03T19:00:08.830Z",
-      "updatedAt": "2025-11-04T00:28:54.104Z"
+      "updatedAt": "2025-11-04T00:28:54.104Z",
+      "comments": []
     },
     {
       "id": "TKT-1762196484974",
@@ -476,7 +491,8 @@
       ],
       "namespace": "config/supabase-client",
       "createdAt": "2025-11-03T19:01:24.974Z",
-      "updatedAt": "2025-11-04T00:28:54.104Z"
+      "updatedAt": "2025-11-04T00:28:54.104Z",
+      "comments": []
     },
     {
       "id": "TKT-1762196606883",
@@ -504,7 +520,8 @@
       ],
       "namespace": "views/pages/stakeholders",
       "createdAt": "2025-11-03T19:03:26.883Z",
-      "updatedAt": "2025-11-04T01:12:30.000Z"
+      "updatedAt": "2025-11-04T01:12:30.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762196745653",
@@ -514,7 +531,9 @@
       "description": "DUPLICATE - Same issue as TKT-1762188267474 which was fixed in Session 9. Closing as duplicate.",
       "status": "closed",
       "priority": "high",
-      "relatedTickets": ["TKT-1762188267474"],
+      "relatedTickets": [
+        "TKT-1762188267474"
+      ],
       "swarmActions": [
         {
           "timestamp": "2025-11-04T01:12:30.000Z",
@@ -526,7 +545,8 @@
       ],
       "namespace": "frontend/dashboard",
       "createdAt": "2025-11-03T19:05:45.653Z",
-      "updatedAt": "2025-11-04T01:12:30.000Z"
+      "updatedAt": "2025-11-04T01:12:30.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762196915214",
@@ -554,7 +574,8 @@
       ],
       "namespace": "services/parsers",
       "createdAt": "2025-11-03T19:08:35.214Z",
-      "updatedAt": "2025-11-04T01:12:30.000Z"
+      "updatedAt": "2025-11-04T01:12:30.000Z",
+      "comments": []
     },
     {
       "id": "TKT-1762197080119",
@@ -562,8 +583,8 @@
       "f12Errors": "mobile-menu.js:192 Mobile menu initialized\naccessibility-keyboard.js:293 ✓ Accessibility keyboard navigation loaded\ntooltips.js:29 [Tooltips] Initialized 4 tooltips\ndashboard/api/documents/create:1  Failed to load resource: the server responded with a status of 400 (Bad Request)\ndashboard.js?v=2:478 Error creating document: Error: new row violates row-level security policy for table \"documents\"\n    at HTMLButtonElement.<anonymous> (dashboard.js?v=2:475:17)\n(anonymous) @ dashboard.js?v=2:478\nRefused to connect to 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js.map' because it violates the following Content Security Policy directive: \"connect-src 'self' https://edxcvppawhiyuhrnzxjm.supabase.co\".\n\nRefused to connect to 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css.map' because it violates the following Content Security Policy directive: \"connect-src 'self' https://edxcvppawhiyuhrnzxjm.supabase.co\".\n\n",
       "serverErrors": "  organizationId: '82d3f028-641a-44f3-aa83-3fe8b84402a7'\n}\n🔍 [DEBUG] Supabase query response: { data: { role: 'owner' }, error: null }\n🔍 [DEBUG] Returning role: owner\n[DocumentService] Error creating document: {\n  code: '42501',\n  details: null,\n  hint: null,\n  message: 'new row violates row-level security policy for table \"documents\"'\n}",
       "description": "Tried to create document.\nMaybe give human a supabase qry to see what the security policies are.",
-      "status": "fixed",
-      "priority": "critical",
+      "status": "closed",
+      "priority": "medium",
       "relatedTickets": [
         "TKT-1762188528841"
       ],
@@ -587,12 +608,35 @@
           "agent": "queen-coordinator",
           "action": "RLS FIXED - Document creation now works",
           "result": "COMPLETE: Migration 016 fixed documents RLS to use user_organizations table. Migration 017 added SELECT policy to user_organizations. Root cause: user_organizations had RLS enabled but no SELECT policy, blocking the documents INSERT policy subquery. Debug endpoint revealed exact issue. Document creation now fully functional."
+        },
+        {
+          "timestamp": "2026-01-21T01:24:28.624Z",
+          "action": "status-change",
+          "result": "Status changed from \"fixed\" to \"closed\""
         }
       ],
       "namespace": "database/rls",
       "createdAt": "2025-11-03T19:11:20.119Z",
-      "updatedAt": "2025-11-04T00:28:54.104Z",
-      "resolution": "Applied migrations 016 and 017"
+      "updatedAt": "2026-01-21T01:24:28.630Z",
+      "resolution": "Applied migrations 016 and 017",
+      "comments": [
+        {
+          "id": "CMT-1768958161088-7r66howbp",
+          "timestamp": "2026-01-21T01:16:01.088Z",
+          "type": "human",
+          "author": "TEST NAME",
+          "content": "TEST COMMENT",
+          "metadata": {}
+        },
+        {
+          "id": "CMT-1768958663012-xkfnjrer3",
+          "timestamp": "2026-01-21T01:24:23.013Z",
+          "type": "human",
+          "author": "TEST 2",
+          "content": "TEST 2",
+          "metadata": {}
+        }
+      ]
     }
   ]
 }

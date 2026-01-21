@@ -1,0 +1,280 @@
+{
+  "recommendedFields": [
+    {
+      "field": "id",
+      "type": "string",
+      "description": "Unique identifier for the comment (e.g., CMT-timestamp-random)",
+      "required": true,
+      "example": "CMT-1730577600000-a1b2c3"
+    },
+    {
+      "field": "ticketId",
+      "type": "string",
+      "description": "Reference to parent ticket ID",
+      "required": true,
+      "example": "TKT-1730577600000"
+    },
+    {
+      "field": "author",
+      "type": "string",
+      "description": "Who created the comment (user, system, ai-agent, etc.)",
+      "required": true,
+      "example": "claude-code"
+    },
+    {
+      "field": "content",
+      "type": "string",
+      "description": "The comment text/body",
+      "required": true,
+      "example": "Fixed the null pointer issue by adding type guards"
+    },
+    {
+      "field": "type",
+      "type": "enum",
+      "values": ["user-comment", "status-change", "priority-change", "assignment-change", "system-action", "ai-analysis"],
+      "description": "Classification of comment for filtering and workflow integration",
+      "required": true,
+      "example": "system-action"
+    },
+    {
+      "field": "visibility",
+      "type": "enum",
+      "values": ["public", "internal"],
+      "description": "Whether comment is visible only to agents/team or to all",
+      "required": false,
+      "default": "internal",
+      "example": "internal"
+    },
+    {
+      "field": "timestamp",
+      "type": "ISO8601",
+      "description": "When the comment was created",
+      "required": true,
+      "example": "2025-11-02T10:30:00.000Z"
+    },
+    {
+      "field": "metadata",
+      "type": "object",
+      "description": "Optional structured data for specific comment types",
+      "required": false,
+      "subfields": {
+        "previousValue": "string",
+        "newValue": "string",
+        "fieldChanged": "string",
+        "relatedTickets": "array",
+        "agentName": "string",
+        "analysisResults": "object"
+      },
+      "example": {
+        "fieldChanged": "status",
+        "previousValue": "open",
+        "newValue": "in-progress"
+      }
+    },
+    {
+      "field": "mentions",
+      "type": "array",
+      "description": "Mentioned users/agents for notifications",
+      "required": false,
+      "itemType": "string",
+      "example": ["@manager", "@reviewer"]
+    },
+    {
+      "field": "attachments",
+      "type": "array",
+      "description": "References to attached files, logs, or screenshots",
+      "required": false,
+      "itemType": "object",
+      "subfields": {
+        "url": "string",
+        "type": "string",
+        "label": "string"
+      }
+    },
+    {
+      "field": "edited",
+      "type": "object",
+      "description": "Track if/when comment was edited",
+      "required": false,
+      "subfields": {
+        "editedAt": "ISO8601",
+        "editedBy": "string",
+        "previousContent": "string"
+      }
+    }
+  ],
+  "commentTypes": [
+    {
+      "type": "user-comment",
+      "description": "Manual human comment on the ticket",
+      "use_case": "Team members providing insights, questions, or clarifications",
+      "required_fields": ["id", "ticketId", "author", "content", "type", "timestamp"],
+      "example": {
+        "type": "user-comment",
+        "author": "developer@example.com",
+        "content": "I think this is related to the race condition in the db pool. Let me investigate.",
+        "visibility": "public"
+      }
+    },
+    {
+      "type": "system-action",
+      "description": "Automated action performed by the system (AI agent, workflow automation)",
+      "use_case": "Claude Code analyzing issues, AI running fixes, automated status updates",
+      "required_fields": ["id", "ticketId", "author", "content", "type", "timestamp", "metadata"],
+      "metadata_fields": ["agentName", "analysisResults"],
+      "example": {
+        "type": "system-action",
+        "author": "claude-code",
+        "content": "Auto-analysis complete. Identified 2 potential root causes.",
+        "metadata": {
+          "agentName": "auto-analyzer",
+          "analysisResults": {
+            "rootCauses": 2,
+            "suggestedPriority": "high",
+            "confidence": 0.85
+          }
+        }
+      }
+    },
+    {
+      "type": "status-change",
+      "description": "Automatic comment when ticket status is updated",
+      "use_case": "Workflow tracking, audit trail of status transitions",
+      "required_fields": ["id", "ticketId", "author", "type", "timestamp", "metadata"],
+      "metadata_fields": ["fieldChanged", "previousValue", "newValue"],
+      "example": {
+        "type": "status-change",
+        "author": "system",
+        "content": "Status changed from open to in-progress",
+        "metadata": {
+          "fieldChanged": "status",
+          "previousValue": "open",
+          "newValue": "in-progress"
+        }
+      }
+    },
+    {
+      "type": "priority-change",
+      "description": "Automatic comment when priority is updated",
+      "use_case": "Priority escalation/de-escalation tracking",
+      "required_fields": ["id", "ticketId", "author", "type", "timestamp", "metadata"],
+      "metadata_fields": ["fieldChanged", "previousValue", "newValue"],
+      "example": {
+        "type": "priority-change",
+        "author": "system",
+        "content": "Priority escalated from medium to critical due to user impact",
+        "metadata": {
+          "fieldChanged": "priority",
+          "previousValue": "medium",
+          "newValue": "critical"
+        }
+      }
+    },
+    {
+      "type": "assignment-change",
+      "description": "Automatic comment when ticket is reassigned",
+      "use_case": "Assignment handoffs, responsibility tracking",
+      "required_fields": ["id", "ticketId", "author", "type", "timestamp", "metadata"],
+      "metadata_fields": ["fieldChanged", "previousValue", "newValue"],
+      "example": {
+        "type": "assignment-change",
+        "author": "system",
+        "content": "Assigned to backend-team",
+        "metadata": {
+          "fieldChanged": "assignee",
+          "previousValue": "frontend-team",
+          "newValue": "backend-team"
+        }
+      }
+    },
+    {
+      "type": "ai-analysis",
+      "description": "Detailed analysis from Claude Code or other AI agents",
+      "use_case": "Root cause analysis, code review, fix suggestions",
+      "required_fields": ["id", "ticketId", "author", "content", "type", "timestamp", "metadata"],
+      "metadata_fields": ["agentName", "analysisResults", "relatedTickets"],
+      "example": {
+        "type": "ai-analysis",
+        "author": "claude-code",
+        "content": "Found the issue: UserList component doesn't handle undefined user.id. Recommended fix: Add optional chaining or default value.",
+        "metadata": {
+          "agentName": "code-analyzer",
+          "analysisResults": {
+            "category": "null-reference",
+            "severity": "high",
+            "affectedFiles": ["UserList.jsx"],
+            "suggestedFix": "Add ?. operator or default value"
+          }
+        }
+      }
+    }
+  ],
+  "recommendedImplementation": {
+    "structure": {
+      "tickets": [
+        {
+          "id": "TKT-1730577600000",
+          "route": "/dashboard/users",
+          "description": "User list crashes when rendering",
+          "status": "open",
+          "priority": "high",
+          "createdAt": "2025-11-02T10:00:00.000Z",
+          "updatedAt": "2025-11-02T10:00:00.000Z",
+          "comments": [
+            {
+              "id": "CMT-1730577600001-a1b2c3",
+              "ticketId": "TKT-1730577600000",
+              "author": "claude-code",
+              "content": "Auto-analysis initiated. Analyzing error trace and related code.",
+              "type": "system-action",
+              "visibility": "internal",
+              "timestamp": "2025-11-02T10:00:30.000Z",
+              "metadata": {
+                "agentName": "auto-analyzer"
+              }
+            },
+            {
+              "id": "CMT-1730577600002-d4e5f6",
+              "ticketId": "TKT-1730577600000",
+              "author": "claude-code",
+              "content": "Root cause identified: UserList.render accesses user.id without null checking. Fixed by adding optional chaining.",
+              "type": "ai-analysis",
+              "visibility": "internal",
+              "timestamp": "2025-11-02T10:05:00.000Z",
+              "metadata": {
+                "agentName": "code-analyzer",
+                "analysisResults": {
+                  "rootCause": "null-pointer-exception",
+                  "severity": "high",
+                  "fixApplied": true
+                }
+              }
+            },
+            {
+              "id": "CMT-1730577600003-g7h8i9",
+              "ticketId": "TKT-1730577600000",
+              "author": "system",
+              "content": "Status changed from open to in-progress",
+              "type": "status-change",
+              "visibility": "internal",
+              "timestamp": "2025-11-02T10:05:15.000Z",
+              "metadata": {
+                "fieldChanged": "status",
+                "previousValue": "open",
+                "newValue": "in-progress"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "rationale": "This design combines industry best practices from GitHub, Jira, Linear, and Zendesk while remaining lightweight for npm package use. Key decisions: (1) Typed comments with specific types (user-comment, system-action, status-change, ai-analysis) enable filtering and automated workflow integration without heavyweight custom fields. (2) Metadata object allows flexibility for different comment types without forcing unused fields on every comment. (3) Visibility distinction (public/internal) mirrors Zendesk and supports team-only discussion while keeping public/user-facing comments separate. (4) Mentions array integrates notification support found in GitHub/Linear. (5) Timestamp and author enable activity tracking crucial for bug workflows. (6) Comments array replaces swarmActions, providing a unified audit trail suitable for Claude Code's AI-powered workflow. The structure is simple to query, filter, and extend without breaking existing tickets.",
+  "implementation_priority": [
+    "Phase 1: Core fields (id, author, content, type, timestamp, ticketId)",
+    "Phase 2: Metadata object for status/priority/assignment changes",
+    "Phase 3: Visibility and mentions for collaboration",
+    "Phase 4: Attachments and rich editing support"
+  ],
+  "migration_note": "Existing 'swarmActions' array should be converted to 'comments' array with type='system-action'. Timestamp and action fields map directly. This maintains backward compatibility in queries while providing richer comment metadata."
+}

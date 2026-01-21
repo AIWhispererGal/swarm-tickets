@@ -1,0 +1,6 @@
+SWARM-TICKETS
+
+1) swarm-tickets need to be able to use EITHER A) a local SQL OR B) a SUpabase attached to a project
+2) Need to include install instructions even for supabase option. 
+3) Add ability for human to add an update to a ticket. Close a ticket etc.. 
+4) We need to be able to let people install a Bug report feature integrated into their application that creates tickets, but doesn't give the same access to the entire ticket system to users (Bug Button --> ADDS to Selected SQL table\
